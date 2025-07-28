@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "148587771416",
+    "project_id": "laporbox-5d4de",
+    "storage_bucket": "laporbox-5d4de.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:148587771416:android:e283fadb142cfb15e0756d",
+        "android_client_info": {
+          "package_name": "com.pillbox.laporbox"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAt6vYU_Y5vlZzzMtNiV5yoqZ9Z5jwOMJw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
