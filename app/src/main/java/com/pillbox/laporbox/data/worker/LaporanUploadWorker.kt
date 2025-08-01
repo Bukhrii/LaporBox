@@ -224,7 +224,6 @@ class LaporanUploadWorker(
         }
     }
 
-    // Fungsi-fungsi helper yang dibutuhkan oleh validateWithAI
     private fun buildDynamicPrompt(resep: ResepModel): String {
         val totalDosesTakenPreviously = resep.totalLaporan.toInt()
         val activeCompartment = (totalDosesTakenPreviously / 3) % 10 + 1

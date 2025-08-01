@@ -27,14 +27,14 @@ import com.pillbox.laporbox.domain.models.OnboardingModel
 
 @Composable
 fun OnboardingGraphic(onboardingModel: OnboardingModel) {
-    // Bungkus semua konten di dalam Column yang bisa di-scroll
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()) // <-- KUNCI PERBAIKANNYA DI SINI
-            .padding(horizontal = 24.dp), // Beri padding agar tidak terlalu mepet
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center // Pusatkan konten jika muat dalam layar
+        verticalArrangement = Arrangement.Center
     ) {
         Spacer(modifier = Modifier.height(80.dp))
 
@@ -64,7 +64,6 @@ fun OnboardingGraphic(onboardingModel: OnboardingModel) {
             )
         }
 
-        // Spacer di bawah agar ada ruang saat scroll sampai akhir
         Spacer(modifier = Modifier.height(32.dp))
     }
 }

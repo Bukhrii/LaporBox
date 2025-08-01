@@ -62,7 +62,6 @@ fun DateInput(
         }
     }
 
-    // TextField dibuat read-only dan clickable untuk memunculkan dialog
     OutlinedTextField(
         value = datePickerState.selectedDateMillis?.let { convertMillisToDate(it) } ?: "",
         onValueChange = {},
@@ -70,7 +69,7 @@ fun DateInput(
         colors = OutlinedTextFieldDefaults.colors(
             disabledTextColor = MaterialTheme.colorScheme.onSurface
         ),
-        enabled = false, // Dibuat false agar tidak bisa diketik, tapi tetap clickable
+        enabled = false,
         readOnly = true,
         leadingIcon = {
             Icon(

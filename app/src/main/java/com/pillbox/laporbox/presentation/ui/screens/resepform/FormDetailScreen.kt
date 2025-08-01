@@ -75,7 +75,6 @@ fun FormDetailScreen(
             )
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Box Rangkuman Data
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,8 +87,6 @@ fun FormDetailScreen(
             ) {
                 SummaryItem("Nama Dokter", state.namaDokter)
                 SummaryItem("Email Faskes", state.emailFaskes)
-//                SummaryItem("Jadwal Kontrol Terakhir", state.tanggalKontrolTerakhir)
-//                SummaryItem("Jadwal Kontrol Berikutnya", state.tanggalKontrolBerikutnya)
                 SummaryItem(
                     label = "Penyakit yang diobati",
                     value = if(state.penyakit == "Lainnya") state.penyakitLainnya else state.penyakit
@@ -102,7 +99,6 @@ fun FormDetailScreen(
 
             Spacer(modifier = Modifier.padding(16.dp))
 
-            // Tombol Simpan
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

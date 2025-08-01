@@ -8,7 +8,7 @@ import com.pillbox.laporbox.domain.repository.ResepRepository
 class SyncResepWorker(
     appContext: Context,
     workerParams: WorkerParameters,
-    private val resepRepository: ResepRepository // Terima repository via DI
+    private val resepRepository: ResepRepository
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {

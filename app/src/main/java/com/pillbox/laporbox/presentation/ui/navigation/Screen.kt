@@ -12,6 +12,5 @@ sealed class Screen(val route: String) {
     object FormKeluarga : Screen("FormKeluarga_Screen")
     object FormObat : Screen("FormObat_Screen")
     object FormDetail : Screen("FormDetail_Screen")
-    object Lapor : Screen("lapor_screen")
     object Profile : Screen("Profile_Screen")
 }

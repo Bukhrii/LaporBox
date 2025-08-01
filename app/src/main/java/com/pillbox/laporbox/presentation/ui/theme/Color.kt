@@ -9,7 +9,7 @@ val MidCyan = Color(0xFF80DEEA)
 val PrimaryCyan = Color(0xFF4DD0E1)
 val DarkCyan = Color(0xFF00BCD4)
 
-// Warna tambahan untuk melengkapi Theme
+
 val DarkerCyan = Color(0xFF004F58)
 val DarkError = Color(0xFFB00020)
 val LightErrorContainer = Color(0xFFF9DEDC)

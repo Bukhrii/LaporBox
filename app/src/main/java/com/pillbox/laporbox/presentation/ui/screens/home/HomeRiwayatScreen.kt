@@ -42,28 +42,26 @@ import com.pillbox.laporbox.domain.models.ResepModel
 
 @Composable
 fun HomeRiwayatScreen(
-    navController: NavController,
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val laporanList by viewModel.laporanList.collectAsState()
     val isLoading by viewModel.isLoadingLaporan.collectAsState()
-    val emailStatus by viewModel.rekapEmailStatus.collectAsState() // Ambil state status email
+    val emailStatus by viewModel.rekapEmailStatus.collectAsState()
 
     val resep by viewModel.reseps.collectAsState()
     val resepInfo = resep.firstOrNull()
 
     val context = LocalContext.current
 
-    // Tampilkan Toast berdasarkan status pengiriman email
     LaunchedEffect(emailStatus) {
         when (emailStatus) {
             EmailSendStatus.SUCCESS -> {
                 Toast.makeText(context, "Rekap laporan berhasil dikirim!", Toast.LENGTH_SHORT).show()
-                viewModel.resetEmailStatus() // Reset status setelah notifikasi
+                viewModel.resetEmailStatus()
             }
             EmailSendStatus.ERROR -> {
                 Toast.makeText(context, "Gagal mengirim rekap. Pastikan email valid.", Toast.LENGTH_LONG).show()
-                viewModel.resetEmailStatus() // Reset status setelah notifikasi
+                viewModel.resetEmailStatus()
             }
             else -> {}
         }
@@ -75,13 +73,11 @@ fun HomeRiwayatScreen(
             .padding(16.dp),
     ) {
         Button(
-            onClick = { viewModel.sendLaporanRekapEmail() }, // Panggil fungsi ViewModel
+            onClick = { viewModel.sendLaporanRekapEmail() },
             shape = MaterialTheme.shapes.extraLarge,
-            // Nonaktifkan tombol saat sedang mengirim atau jika tidak ada laporan
             enabled = emailStatus != EmailSendStatus.SENDING && laporanList.isNotEmpty()
         ) {
             if (emailStatus == EmailSendStatus.SENDING) {
-                // Tampilkan loading indicator di dalam tombol
                 CircularProgressIndicator(
                     modifier = Modifier.size(18.dp),
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -133,7 +129,6 @@ private fun LaporanItem(laporan: LaporanModel, resep: ResepModel?) {
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 1. Gambar Thumbnail di Kiri
             AsyncImage(
                 model = laporan.imageUrl,
                 contentDescription = "Foto Laporan",
@@ -145,12 +140,10 @@ private fun LaporanItem(laporan: LaporanModel, resep: ResepModel?) {
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // 2. Kolom untuk Teks di Sebelah Kanan Gambar
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                // Teks Nama Obat & Penyakit
                 Text(
                     text = resep?.namaObat ?: "Nama Obat",
                     style = MaterialTheme.typography.titleMedium,
@@ -165,7 +158,6 @@ private fun LaporanItem(laporan: LaporanModel, resep: ResepModel?) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Baris untuk Tanggal dan Waktu
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,

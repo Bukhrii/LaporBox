@@ -52,12 +52,12 @@ private val DarkColorScheme = darkColorScheme(
     secondaryContainer = DarkerCyan,
     onSecondaryContainer = LightCyan,
     tertiary = DarkCyan,
-    onTertiary = TextBlack, // Diubah agar kontras lebih baik
+    onTertiary = TextBlack,
     tertiaryContainer = DarkerCyan,
     onTertiaryContainer = LightCyan,
     background = TextBlack,
     onBackground = AlmostWhite,
-    surface = Color(0xFF1F1F1F), // Sedikit lebih terang dari background
+    surface = Color(0xFF1F1F1F),
     onSurface = AlmostWhite,
     surfaceVariant = Color(0xFF3C3C3C),
     onSurfaceVariant = AlmostWhite,
@@ -71,7 +71,6 @@ private val DarkColorScheme = darkColorScheme(
 @Composable
 fun LaporBoxTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -90,7 +89,6 @@ fun LaporBoxTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = Color.Transparent.toArgb()
-            // Mengatur warna ikon status bar (jam, baterai) menjadi gelap saat tema terang, dan sebaliknya.
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }

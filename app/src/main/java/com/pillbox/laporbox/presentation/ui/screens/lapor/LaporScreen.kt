@@ -52,7 +52,6 @@ fun LaporScreen(
         }
     }
 
-    // Perubahan pesan Toast agar lebih sesuai dengan alur baru
     LaunchedEffect(state.uploadStatus) {
         when (state.uploadStatus) {
             UploadStatus.SUCCESS -> {
@@ -89,8 +88,6 @@ fun LaporScreen(
                 verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // --- PERBAIKAN DI SINI ---
-                // Mengganti UPLOADING menjadi SAVING agar sesuai dengan ViewModel
                 if (state.uploadStatus == UploadStatus.SAVING) {
                     CircularProgressIndicator(color = Color.White)
                 } else {

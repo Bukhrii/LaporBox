@@ -45,20 +45,19 @@ class ResepRepositoryImpl(
         val userId = getCurrentUserId() ?: return Resource.Error("User tidak login")
         return try {
             Log.d(tag, "Memulai fetchAndSyncReseps untuk user: $userId")
-            // 1. Ambil semua data resep dari Firestore untuk user ini
+
             val snapshot = firestore.collection("users").document(userId)
                 .collection("resep").get().await()
 
-            // 2. Ubah setiap dokumen Firestore menjadi ResepEntity
+
             val resepEntities = snapshot.documents.mapNotNull { document ->
-                // Menggunakan toObject untuk konversi otomatis, lebih aman
+
                 document.toObject(ResepEntity::class.java)?.copy(id = document.id, userId = userId)
             }
 
             Log.d(tag, "Ditemukan ${resepEntities.size} resep dari Firestore.")
 
-            // 3. Simpan semua entitas ke dalam database Room
-            // insertOrUpdate akan menambahkan data baru dan memperbarui yang sudah ada
+
             resepDao.insertOrUpdateAll(resepEntities)
 
             Log.d(tag, "Sinkronisasi ke database lokal berhasil.")
@@ -71,20 +70,17 @@ class ResepRepositoryImpl(
 
 
     override fun getReseps(): Flow<List<ResepModel>> {
-        // Flow ini akan memancarkan (emit) UID pengguna setiap kali status login berubah.
+
         return callbackFlow {
             val authListener = FirebaseAuth.AuthStateListener { auth ->
                 trySend(auth.currentUser?.uid)
             }
             auth.addAuthStateListener(authListener)
-            // Hapus listener saat flow ditutup untuk menghindari memory leak.
             awaitClose { auth.removeAuthStateListener(authListener) }
         }.flatMapLatest { userId ->
             if (userId == null) {
-                // Jika pengguna logout, kembalikan daftar kosong.
                 flowOf(emptyList())
             } else {
-                // Jika pengguna login, buat flow baru yang mendengarkan pembaruan real-time dari Firestore.
                 val query = firestore.collection("users").document(userId)
                     .collection("resep")
                     .orderBy("createdAt", Query.Direction.DESCENDING)
@@ -93,34 +89,29 @@ class ResepRepositoryImpl(
                     val snapshotListener = query.addSnapshotListener { snapshot, error ->
                         if (error != null) {
                             Log.w(tag, "Firestore listen error", error)
-                            close(error) // Tutup flow jika terjadi error.
+                            close(error)
                             return@addSnapshotListener
                         }
                         if (snapshot != null) {
-                            // Ubah dokumen Firestore menjadi List<ResepModel>.
                             val resepModels = snapshot.toObjects(ResepModel::class.java)
 
-                            // PENTING: Perbarui cache lokal (Room) dengan data baru dari Firestore.
-                            // Ini memastikan akses offline ke data terbaru.
                             val resepEntities = snapshot.documents.mapNotNull { document ->
                                 document.toObject(ResepEntity::class.java)?.copy(
                                     id = document.id,
                                     userId = userId,
-                                    isSynced = true // Data dari Firestore selalu dianggap tersinkronisasi.
+                                    isSynced = true
                                 )
                             }
 
-                            // Jalankan proses penulisan ke database di background thread.
                             CoroutineScope(Dispatchers.IO).launch {
                                 resepDao.insertOrUpdateAll(resepEntities)
                                 Log.d(tag, "Cache lokal diperbarui dengan ${resepEntities.size} item dari Firestore.")
                             }
 
-                            // Kirim data terbaru ke UI.
                             trySend(resepModels).isSuccess
                         }
                     }
-                    // Hapus listener saat flow tidak lagi diamati untuk mencegah memory leak.
+
                     awaitClose {
                         Log.d(tag, "Menutup listener Firestore untuk user $userId")
                         snapshotListener.remove()
@@ -136,17 +127,17 @@ class ResepRepositoryImpl(
 
     override suspend fun addResep(resep: ResepModel): Resource<Unit> {
         val userId = getCurrentUserId() ?: return Resource.Error("User tidak login")
-        val entity = resep.toResepEntity(userId).copy(isSynced = false) // Tandai belum sinkron
-        resepDao.insertOrUpdateResep(entity) // Simpan ke lokal
-        syncSingleResepToFirestore(entity) // Coba sinkronisasi
-        return Resource.Success(Unit) // Langsung kembalikan success karena sudah aman di lokal
+        val entity = resep.toResepEntity(userId).copy(isSynced = false)
+        resepDao.insertOrUpdateResep(entity)
+        syncSingleResepToFirestore(entity)
+        return Resource.Success(Unit)
     }
 
     override suspend fun updateResep(resep: ResepModel): Resource<Unit> {
         val userId = getCurrentUserId() ?: return Resource.Error("User tidak login")
-        val entity = resep.toResepEntity(userId).copy(isSynced = false) // Tandai butuh sinkronisasi
-        resepDao.insertOrUpdateResep(entity) // Update di lokal
-        syncSingleResepToFirestore(entity) // Coba sinkronisasi
+        val entity = resep.toResepEntity(userId).copy(isSynced = false)
+        resepDao.insertOrUpdateResep(entity)
+        syncSingleResepToFirestore(entity)
         return Resource.Success(Unit)
     }
 
@@ -154,9 +145,8 @@ class ResepRepositoryImpl(
         val userId = getCurrentUserId() ?: return Resource.Error("User tidak login")
         val entity = resep.toResepEntity(userId)
 
-        resepDao.deleteResep(entity) // Hapus dari lokal
+        resepDao.deleteResep(entity)
 
-        // Coba hapus dari Firestore
         try {
             firestore.collection("users").document(userId)
                 .collection("resep").document(resep.id)
@@ -164,19 +154,15 @@ class ResepRepositoryImpl(
             Log.d(tag, "Resep ${resep.id} berhasil dihapus dari Firestore.")
         } catch (e: Exception) {
             Log.e(tag, "Gagal hapus di Firestore, data sudah dihapus lokal.", e)
-            // Di masa depan, bisa ditambahkan logika untuk menyimpan ID yang gagal dihapus
-            // dan mencoba lagi nanti.
         }
         return Resource.Success(Unit)
     }
 
-    // Fungsi private untuk mencoba sinkronisasi satu resep
     private suspend fun syncSingleResepToFirestore(entity: ResepEntity) {
         try {
             firestore.collection("users").document(entity.userId)
                 .collection("resep").document(entity.id)
                 .set(entity).await()
-            // Jika berhasil, update status di Room
             resepDao.insertOrUpdateResep(entity.copy(isSynced = true))
             Log.d(tag, "Resep ${entity.id} berhasil disinkronkan.")
         } catch (e: Exception) {
@@ -184,7 +170,6 @@ class ResepRepositoryImpl(
         }
     }
 
-    // Mapper Helpers (bisa diletakkan di file terpisah)
     private fun ResepEntity.toResepModel(): ResepModel {
         return ResepModel(
             id = this.id,
@@ -232,7 +217,7 @@ class ResepRepositoryImpl(
         val unsyncedReseps = resepDao.getUnsyncedReseps(userId)
         if (unsyncedReseps.isEmpty()) {
             Log.d(tag, "Tidak ada resep untuk disinkronkan.")
-            return true // Dianggap sukses karena tidak ada yang perlu dilakukan
+            return true
         }
 
         var allSucceeded = true
@@ -241,21 +226,16 @@ class ResepRepositoryImpl(
                 firestore.collection("users").document(userId)
                     .collection("resep").document(entity.id)
                     .set(entity).await()
-                // Jika berhasil, update status di Room
                 resepDao.insertOrUpdateResep(entity.copy(isSynced = true))
                 Log.d(tag, "Sinkronisasi berhasil untuk resep: ${entity.id}")
             } catch (e: Exception) {
                 Log.e(tag, "Sinkronisasi gagal untuk resep: ${entity.id}", e)
-                allSucceeded = false // Tandai jika ada satu saja yang gagal
+                allSucceeded = false
             }
         }
         return allSucceeded
     }
 
-    /**
-     * Memulai pekerjaan sinkronisasi periodik menggunakan WorkManager.
-     * Akan berjalan setiap 6 jam jika perangkat terhubung ke internet.
-     */
     override fun startSync() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -267,15 +247,12 @@ class ResepRepositoryImpl(
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             SyncResepWorker.WORK_NAME,
-            ExistingPeriodicWorkPolicy.KEEP, // Tetap jalankan job yang ada
+            ExistingPeriodicWorkPolicy.KEEP,
             periodicSyncRequest
         )
         Log.d(tag, "Periodic sync worker dimulai.")
     }
 
-    /**
-     * Menghentikan pekerjaan sinkronisasi.
-     */
     override fun stopSync() {
         WorkManager.getInstance(context).cancelUniqueWork(SyncResepWorker.WORK_NAME)
         Log.d(tag, "Periodic sync worker dihentikan.")

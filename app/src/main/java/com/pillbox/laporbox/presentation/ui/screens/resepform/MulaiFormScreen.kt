@@ -25,9 +25,7 @@ import com.pillbox.laporbox.presentation.ui.navigation.Screen
 @Composable
 fun MulaiFormScreen(
     navController: NavController,
-    viewModel: FormResepViewModel
 ) {
-    // Gunakan Box untuk menempatkan tombol kembali di pojok kiri atas
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -35,13 +33,12 @@ fun MulaiFormScreen(
     ) {
         BackButtonIconOnprimary(onClick = { navController.popBackStack() })
 
-        // Gunakan satu Column untuk memusatkan semua konten lainnya
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 32.dp), // Beri padding horizontal
+                .padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center // Atur agar konten rata tengah vertikal
+            verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = stringResource(R.string.mulai_form),

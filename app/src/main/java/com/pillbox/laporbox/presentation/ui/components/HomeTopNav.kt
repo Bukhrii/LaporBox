@@ -52,7 +52,7 @@ fun HomeTopNavigation(pagerState: PagerState, onTabSelected: (Int) -> Unit) {
 private fun RowScope.TabItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
     Column(
         modifier = Modifier
-            .weight(1f) // Membuat kedua tab memiliki lebar yang sama
+            .weight(1f)
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,

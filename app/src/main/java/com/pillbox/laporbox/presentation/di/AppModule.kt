@@ -31,11 +31,10 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-// --- MODUL UNTUK JARINGAN (RETROFIT) ---
 val networkModule = module {
     single {
         Retrofit.Builder()
-            .baseUrl("https://api.brevo.com/v3/") // Base URL untuk Resend API
+            .baseUrl("https://api.brevo.com/v3/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -51,7 +50,7 @@ val databaseModule = module {
             AppDatabase::class.java,
             "laporbox-database"
         )
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration(false)
             .build()
     }
     single { get<AppDatabase>().resepDao() }
@@ -80,11 +79,9 @@ val repositoryModule = module {
     single<DataStoreRepository> {
         DataStoreRepositoryImpl(context = androidContext())
     }
-    // --- INI BAGIAN YANG DIPERBAIKI ---
     single<EmailRepository> {
         EmailRepositoryImpl(apiService = get())
     }
-    // ---------------------------------
 }
 
 val useCaseModule = module {
@@ -124,7 +121,6 @@ val viewModelModule = module {
             context = androidContext()
         )
     }
-    // PASTIKAN BLOK INI ADA
     viewModel {
         MainViewModel(
             readOnboardingUseCase = get()
@@ -159,7 +155,6 @@ val workerModule = module {
     }
 }
 
-// --- DAFTAR SEMUA MODULE ---
 val appModules = listOf(
     networkModule,
     databaseModule,

@@ -63,8 +63,6 @@ class HomeViewModel(
         }
     }
 
-    // Fungsi sinkronisasi manual tidak lagi diperlukan untuk alur utama,
-    // namun bisa tetap ada jika Anda ingin menambahkan fitur "refresh" manual.
     fun syncResepsFromRemote() {
         viewModelScope.launch {
             Log.d("HomeViewModel", "Memulai sinkronisasi manual dari remote...")
@@ -104,7 +102,6 @@ class HomeViewModel(
                 return@launch
             }
 
-            // Gabungkan email faskes dan keluarga, dan hapus duplikat jika ada
             val penerima = listOfNotNull(
                 resep.emailFaskes.takeIf { it.isNotBlank() },
                 resep.emailKeluarga.takeIf { it.isNotBlank() }
@@ -134,10 +131,8 @@ class HomeViewModel(
     }
 
     private fun buildHtmlRecap(resep: ResepModel, laporan: List<LaporanModel>, user: UserModel): String {
-        // Format tanggal ke Bahasa Indonesia
         val formatter = SimpleDateFormat("EEEE, dd MMMM yyyy, HH:mm", Locale("id", "ID"))
 
-        // Buat daftar laporan dalam format HTML
         val laporanHtml = laporan.joinToString("") { lap ->
             """
             <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 8px;">

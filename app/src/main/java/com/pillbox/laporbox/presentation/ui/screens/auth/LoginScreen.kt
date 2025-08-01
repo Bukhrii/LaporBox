@@ -73,7 +73,6 @@ fun LoginScreen(
         when (val state = authState) {
             is AuthState.Authenticated -> {
                 Toast.makeText(context, "Login berhasil!", Toast.LENGTH_SHORT).show()
-                // Panggil sinkronisasi sebelum navigasi
                 homeViewModel.syncResepsFromRemote()
                 onLoginSuccess()
             }

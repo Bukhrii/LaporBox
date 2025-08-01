@@ -39,7 +39,6 @@ class FormResepViewModel(
     private val _uiState = MutableStateFlow(FormResepState())
     val uiState = _uiState.asStateFlow()
 
-    // Fungsi ini dipanggil saat form dibuka. Jika resepId ada, muat data untuk mode EDIT.
     fun loadResep(resepId: String?) {
         if (resepId == null) {
             _uiState.value = FormResepState(formMode = FormMode.CREATE)

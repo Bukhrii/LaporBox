@@ -16,7 +16,6 @@ class EmailRepositoryImpl(private val apiService: BrevoApiService) : EmailReposi
         subjek: String,
         kontenHtml: String
     ): Resource<Unit> {
-        // Log saat fungsi dimulai
         Log.d("EmailRepositoryImpl", "--- MEMULAI PROSES PENGIRIMAN EMAIL ---")
         Log.d("EmailRepositoryImpl", "Penerima: $penerima")
 
@@ -35,7 +34,6 @@ class EmailRepositoryImpl(private val apiService: BrevoApiService) : EmailReposi
                 htmlContent = kontenHtml
             )
 
-            // Log request body dalam format JSON sebelum dikirim
             val jsonRequest = Gson().toJson(emailRequest)
             Log.d("EmailRepositoryImpl", "Request Body JSON yang akan dikirim: $jsonRequest")
 

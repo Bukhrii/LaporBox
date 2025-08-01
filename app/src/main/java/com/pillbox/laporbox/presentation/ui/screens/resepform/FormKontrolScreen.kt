@@ -30,11 +30,9 @@ fun FormKontrolScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    // Buat dua state terpisah untuk masing-masing DatePicker
     val lastControlDateState = rememberDatePickerState()
     val nextControlDateState = rememberDatePickerState()
 
-    // Gunakan LaunchedEffect untuk mengupdate ViewModel saat tanggal dipilih
     LaunchedEffect(lastControlDateState.selectedDateMillis) {
         lastControlDateState.selectedDateMillis?.let { millis ->
             viewModel.onTanggalKontrolTerakhirChange(convertMillisToDate(millis))
@@ -67,7 +65,6 @@ fun FormKontrolScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            // Spacer untuk menengahkan konten (jika diinginkan)
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
@@ -84,7 +81,6 @@ fun FormKontrolScreen(
             )
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Menggunakan komponen DateInput yang baru
             DateInput(
                 label = "Jadwal terakhir kontrol",
                 datePickerState = lastControlDateState
@@ -92,13 +88,12 @@ fun FormKontrolScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Menggunakan komponen DateInput yang baru untuk field kedua
             DateInput(
                 label = "Jadwal kontrol terdekat berikutnya",
                 datePickerState = nextControlDateState
             )
 
-            Spacer(modifier = Modifier.padding(16.dp)) // Spacer untuk mendorong tombol ke bawah
+            Spacer(modifier = Modifier.padding(16.dp))
 
             Row(
                 modifier = Modifier

@@ -45,23 +45,18 @@ const val RESEP_ROUTE = "resep_flow"
 
 @Composable
 fun RootNavGraph(
-    // Inject ViewModel yang diperlukan di level tertinggi
     authViewModel: AuthViewModel = koinViewModel(),
     onboardingViewModel: OnboardingViewModel = koinViewModel()
 ) {
     val navController = rememberNavController()
 
-    // Ambil state dari ViewModel
     val hasCompletedOnboarding by onboardingViewModel.onboardingCompleted.collectAsState(initial = null)
     val authState by authViewModel.authState.observeAsState()
 
-    // Tampilkan layar kosong selagi menunggu state dimuat
     if (hasCompletedOnboarding == null || authState == null) {
-        // Bisa diganti dengan Composable Splash Screen atau loading indicator
         return
     }
 
-    // Tentukan rute awal secara dinamis berdasarkan state
     val startDestination = when {
         hasCompletedOnboarding == false -> Screen.Onboarding.route
         authState is AuthState.Authenticated -> MAIN_GRAPH_ROUTE
@@ -72,12 +67,9 @@ fun RootNavGraph(
         navController = navController,
         startDestination = startDestination
     ) {
-        // 1. Rute Onboarding (jika belum selesai)
         composable(Screen.Onboarding.route) {
             OnboardingScreen(
                 onFinish = {
-                    // Setelah onboarding selesai, navigasi ke auth graph.
-                    // Jika user sudah login, startDestination akan otomatis mengarahkannya ke main graph.
                     navController.navigate(AUTH_GRAPH_ROUTE) {
                         popUpTo(Screen.Onboarding.route) { inclusive = true }
                     }
@@ -85,10 +77,8 @@ fun RootNavGraph(
             )
         }
 
-        // 2. Graph Autentikasi (Login & Register)
         authNavGraph(navController = navController)
 
-        // 3. Graph Utama Aplikasi (setelah login berhasil)
         mainNavGraph(navController = navController)
     }
 }
@@ -99,9 +89,9 @@ fun NavGraphBuilder.authNavGraph(navController: NavController) {
         startDestination = Screen.LoginScreen.route
     ) {
         composable(Screen.LoginScreen.route) {
-            val homeViewModel: HomeViewModel = koinViewModel() // Dapatkan instance HomeViewModel
+            val homeViewModel: HomeViewModel = koinViewModel()
             LoginScreen(
-                homeViewModel = homeViewModel, // Pass ViewModel
+                homeViewModel = homeViewModel,
                 onLoginSuccess = {
                     navController.navigate(MAIN_GRAPH_ROUTE) {
                         popUpTo(AUTH_GRAPH_ROUTE) { inclusive = true }
@@ -134,13 +124,11 @@ fun NavGraphBuilder.mainNavGraph(navController: NavController) {
             HomeScreen(navController = navController)
         }
         composable(Screen.Profile.route) {
-            // Contoh jika profile butuh logout
             val authViewModel: AuthViewModel = koinViewModel()
             ProfileScreen(
                 navController = navController,
                 onLogout = {
                     authViewModel.signOut()
-                    // Setelah logout, kembali ke auth graph
                     navController.navigate(AUTH_GRAPH_ROUTE) {
                         popUpTo(MAIN_GRAPH_ROUTE) { inclusive = true }
                     }
@@ -149,26 +137,22 @@ fun NavGraphBuilder.mainNavGraph(navController: NavController) {
         }
 
         composable(
-            route = "lapor_screen/{resepId}", // Definisikan argumen di rute
+            route = "lapor_screen/{resepId}",
             arguments = listOf(navArgument("resepId") { type = NavType.StringType })
         ) { backStackEntry ->
-            // Ambil argumen dari backStackEntry
             val resepId = backStackEntry.arguments?.getString("resepId")
             if (resepId != null) {
                 LaporScreen(navController = navController, resepId = resepId)
             } else {
-                // Handle jika resepId tidak ada, misal kembali ke halaman sebelumnya
                 navController.popBackStack()
             }
         }
 
-        // Graph untuk form resep berada di dalam main graph
         formResepNavGraph(navController = navController)
     }
 }
 
 
-// Fungsi ekstensi untuk NavGraphBuilder
 fun NavGraphBuilder.formResepNavGraph(navController: NavController) {
     navigation(
         startDestination = Screen.MulaiForm.route,
@@ -179,25 +163,19 @@ fun NavGraphBuilder.formResepNavGraph(navController: NavController) {
         })
     ) {
 
-        // Setiap layar di dalam 'navigation' ini akan berbagi ViewModel yang sama
-        // karena kita mengaitkannya ke 'RESEP_ROUTE'.
-
         composable(Screen.MulaiForm.route) { backStackEntry ->
-            // Dapatkan parent entry dari rute 'navigation' yang benar
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry("$RESEP_ROUTE?resepId={resepId}")
             }
             val viewModel: FormResepViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
 
-            // AMBIL resepId dari argumen
             val resepId = backStackEntry.arguments?.getString("resepId")
 
-            // GUNAKAN LaunchedEffect untuk memanggil loadResep HANYA SEKALI
             LaunchedEffect(key1 = resepId) {
                 viewModel.loadResep(resepId)
             }
 
-            MulaiFormScreen(navController = navController, viewModel = viewModel)
+            MulaiFormScreen(navController = navController)
         }
 
         composable(Screen.FormDokter.route) { backStackEntry ->

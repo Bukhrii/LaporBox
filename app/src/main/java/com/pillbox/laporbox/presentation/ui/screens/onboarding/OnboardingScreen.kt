@@ -41,7 +41,6 @@ fun OnboardingScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.primary)
     ) {
-        // Pager mengambil sisa ruang yang tersedia
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.weight(1f)
@@ -49,7 +48,6 @@ fun OnboardingScreen(
             OnboardingGraphic(onboardingModel = pages.getOrNull(pageIndex) ?: OnboardingModel.FirstPages)
         }
 
-        // Tombol "Mulai" atau "Selanjutnya"
         Box(
             modifier = Modifier
                 .fillMaxWidth()

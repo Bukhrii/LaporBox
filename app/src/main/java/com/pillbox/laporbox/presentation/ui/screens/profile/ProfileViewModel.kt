@@ -46,7 +46,7 @@ class ProfileViewModel(
                     _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
                 }
                 is Resource.Loading -> {
-                    // Handled by isLoading state
+                    _uiState.update { it.copy(isLoading = true, errorMessage = null) }
                 }
             }
         }

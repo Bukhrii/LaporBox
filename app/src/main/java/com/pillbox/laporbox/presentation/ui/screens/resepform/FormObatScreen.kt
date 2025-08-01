@@ -51,10 +51,8 @@ fun FormObatScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    // --- State untuk Dropdown ---
     var isExpanded by remember { mutableStateOf(false) }
     val frekuensiOptions = listOf("1x sehari", "2x sehari", "3x sehari", "Sesuai kebutuhan")
-    // ----------------------------
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -105,7 +103,6 @@ fun FormObatScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // --- IMPLEMENTASI DROPDOWN ---
             ExposedDropdownMenuBox(
                 expanded = isExpanded,
                 onExpandedChange = { isExpanded = it },
@@ -113,14 +110,14 @@ fun FormObatScreen(
             ) {
                 OutlinedTextField(
                     value = state.frekuensiObat,
-                    onValueChange = {}, // Dikosongkan karena nilai dipilih dari menu
-                    readOnly = true, // Membuat field tidak bisa diketik
+                    onValueChange = {},
+                    readOnly = true,
                     label = { Text(stringResource(R.string.obat_form_frequency)) },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
                     },
                     modifier = Modifier
-                        .menuAnchor() // Kaitkan TextField dengan menu
+                        .menuAnchor()
                         .fillMaxWidth()
                 )
 
@@ -132,14 +129,13 @@ fun FormObatScreen(
                         DropdownMenuItem(
                             text = { Text(option) },
                             onClick = {
-                                viewModel.onFrekuensiObatChange(option) // Update ViewModel
-                                isExpanded = false // Tutup menu
+                                viewModel.onFrekuensiObatChange(option)
+                                isExpanded = false
                             }
                         )
                     }
                 }
             }
-            // ------------------------------------
 
             Spacer(modifier = Modifier.padding(16.dp))
             Row(

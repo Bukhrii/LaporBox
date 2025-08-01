@@ -4,7 +4,7 @@ import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
 data class ResepModel(
-    val id: String = "", // <-- TAMBAHKAN INI
+    val id: String = "",
     val userId: String = "",
     val namaDokter: String = "",
     val emailFaskes: String = "",

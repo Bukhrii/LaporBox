@@ -16,7 +16,6 @@ class DataStoreRepositoryImpl(context: Context) : DataStoreRepository {
 
     private val dataStore = context.dataStore
 
-    // Kunci untuk menyimpan nilai boolean
     private object PreferencesKey {
         val onBoardingKey = booleanPreferencesKey(name = "is_onboarding_completed")
     }
@@ -29,7 +28,6 @@ class DataStoreRepositoryImpl(context: Context) : DataStoreRepository {
 
     override fun readOnboardingState(): Flow<Boolean> {
         return dataStore.data.map { preferences ->
-            // Mengembalikan false jika key tidak ditemukan (default)
             preferences[PreferencesKey.onBoardingKey] ?: false
         }
     }

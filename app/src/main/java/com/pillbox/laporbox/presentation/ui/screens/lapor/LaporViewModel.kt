@@ -28,7 +28,6 @@ data class LaporanState(
 enum class UploadStatus { IDLE, SAVING, SUCCESS, ERROR }
 
 class LaporViewModel(
-    // Hanya butuh DAO dan context untuk WorkManager
     private val LaporanDao: LaporanDao,
     private val context: Context
 ) : ViewModel() {
@@ -36,7 +35,6 @@ class LaporViewModel(
     private val _uiState = MutableStateFlow(LaporanState())
     val uiState = _uiState.asStateFlow()
 
-    // Ganti nama fungsi menjadi lebih sesuai
     fun takePhotoAndQueueForUpload(
         context: Context,
         imageCapture: ImageCapture,
@@ -57,18 +55,14 @@ class LaporViewModel(
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     viewModelScope.launch {
-                        // 1. Buat entitas untuk disimpan di database offline
                         val offlineLaporan = LaporanEntity(
                             resepId = resepId,
                             imagePath = photoFile.absolutePath
                         )
-                        // 2. Simpan ke database lokal
                         LaporanDao.insert(offlineLaporan)
 
-                        // 3. Jadwalkan Worker untuk berjalan
                         scheduleLaporanUploadWorker()
 
-                        // 4. Update UI bahwa tugas selesai (dari sisi pengguna)
                         _uiState.update { it.copy(uploadStatus = UploadStatus.SUCCESS) }
                     }
                 }
@@ -78,7 +72,7 @@ class LaporViewModel(
 
     private fun scheduleLaporanUploadWorker() {
         val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED) // Hanya berjalan jika ada internet
+            .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
         val uploadWorkRequest = OneTimeWorkRequestBuilder<LaporanUploadWorker>()

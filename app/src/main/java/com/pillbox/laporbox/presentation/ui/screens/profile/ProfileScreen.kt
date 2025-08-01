@@ -32,13 +32,12 @@ import org.koin.androidx.compose.koinViewModel
 fun ProfileScreen(
     navController: NavController,
     viewModel: ProfileViewModel = koinViewModel(),
-    homeViewModel: HomeViewModel = koinViewModel(), // Ditambahkan untuk mendapatkan resepId
+    homeViewModel: HomeViewModel = koinViewModel(),
     onLogout: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
     val user = state.user
 
-    // Ambil daftar resep dari HomeViewModel untuk mendapatkan resepId
     val resepList by homeViewModel.reseps.collectAsState()
     val resepIdForLaporan = resepList.firstOrNull()?.id ?: ""
 
@@ -63,14 +62,13 @@ fun ProfileScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // Padding dari Scaffold
-                .padding(horizontal = 24.dp) // Padding konten
+                .padding(paddingValues)
+                .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Bagian Foto Profil
             Box(
                 modifier = Modifier
                     .size(120.dp)
@@ -88,10 +86,8 @@ fun ProfileScreen(
                         CircularProgressIndicator(modifier = Modifier.padding(24.dp))
                     },
                     error = {
-                        // --- PERBAIKAN DI SINI ---
-                        // Menggunakan Image, bukan Icon
                         Image(
-                            painter = painterResource(id = R.drawable.user_profile), // Ganti ke drawable Anda jika berbeda
+                            painter = painterResource(id = R.drawable.user_profile),
                             contentDescription = "Placeholder Foto",
                             modifier = Modifier.size(72.dp)
                         )
@@ -101,13 +97,12 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            TextButton(onClick = { /* TODO: Logika ubah foto */ }) {
+            TextButton(onClick = {  }) {
                 Text(text = "Ubah Foto", color = MaterialTheme.colorScheme.primary)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Informasi Pengguna
             if (state.isLoading) {
                 CircularProgressIndicator()
             } else if (user != null) {
@@ -121,9 +116,8 @@ fun ProfileScreen(
             }
 
 
-            Spacer(modifier = Modifier.weight(1f)) // Mendorong tombol ke bawah
+            Spacer(modifier = Modifier.weight(1f))
 
-            // Tombol Logout
             Button(
                 onClick = onLogout,
                 modifier = Modifier
@@ -133,7 +127,7 @@ fun ProfileScreen(
                     containerColor = MaterialTheme.colorScheme.error
                 )
             ) {
-                Text("Logout")
+                Text("Logout", color = MaterialTheme.colorScheme.onError)
             }
         }
     }

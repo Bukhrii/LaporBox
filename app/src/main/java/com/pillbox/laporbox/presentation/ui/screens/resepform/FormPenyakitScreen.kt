@@ -113,7 +113,6 @@ fun FormPenyakitScreen(
     }
 }
 
-// Composable terpisah untuk kartu pilihan
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectableOptionCard(

@@ -24,23 +24,18 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen(
     navController: NavController,
     homeViewModel: HomeViewModel = koinViewModel()) {
-    // State untuk mengontrol Pager (halaman mana yang aktif)
-    val pagerState = rememberPagerState(initialPage = 0) { 2 } // Ada 2 halaman
+    val pagerState = rememberPagerState(initialPage = 0) { 2 }
     val scope = rememberCoroutineScope()
 
-    // Ambil daftar resep dari ViewModel
     val resepList by homeViewModel.reseps.collectAsState()
 
-    // Ambil ID dari resep pertama, jika ada.
     val resepIdForLaporan = resepList.firstOrNull()?.id ?: ""
 
     Scaffold(
         topBar = {
-            // Kirim pagerState & scope agar TopBar bisa mengontrol Pager
             HomeTopNavigation(
                 pagerState = pagerState,
                 onTabSelected = { page ->
-                    // Animasikan scroll ke halaman yang dipilih
                     scope.launch {
                         pagerState.animateScrollToPage(page)
                     }
@@ -48,15 +43,13 @@ fun HomeScreen(
             )
         },
         content = { paddingValues ->
-            // HorizontalPager untuk konten yang bisa digeser
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.padding(paddingValues)
             ) { page ->
-                // Tampilkan halaman yang sesuai berdasarkan indeks pager
                 when (page) {
                     0 -> HomeResepScreen(navController = navController, viewModel = homeViewModel)
-                    1 -> HomeRiwayatScreen(navController = navController, viewModel = homeViewModel)
+                    1 -> HomeRiwayatScreen(viewModel = homeViewModel)
                 }
             }
         },
