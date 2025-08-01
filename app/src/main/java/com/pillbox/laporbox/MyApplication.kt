@@ -15,7 +15,6 @@ class MyApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
 
-        // --- TAMBAHKAN BLOK INISIALISASI CLOUDINARY DI SINI ---
         try {
             val config = mapOf(
                 "cloud_name" to BuildConfig.CLOUDINARY_CLOUD_NAME,
@@ -26,7 +25,6 @@ class MyApplication : Application(), Configuration.Provider {
         } catch (e: Exception) {
             Log.e("MyApplication", "Gagal inisialisasi Cloudinary: ${e.message}")
         }
-        // --------------------------------------------------------
 
         startKoin {
             androidContext(this@MyApplication)
