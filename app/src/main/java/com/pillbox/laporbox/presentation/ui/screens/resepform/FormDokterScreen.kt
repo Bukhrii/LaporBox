@@ -76,6 +76,7 @@ fun FormDokterScreen(
                 .padding(paddingValues)
                 .padding(horizontal = 24.dp)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
 
         ) {
 
@@ -127,8 +128,7 @@ fun FormDokterScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Tombol Navigasi
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.padding(16.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

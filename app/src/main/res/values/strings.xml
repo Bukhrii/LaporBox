@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">LaporBox</string>
 
-    <string name="onboarding_title_first">Selamat datang di avbnm.</string>
+    <string name="onboarding_title_first">Selamat datang di LaporBox</string>
     <string name="onboarding_title_second">Obat Tak Pernah Terlewat</string>
     <string name="onboarding_title_third">Minum Obat? Foto Dulu!</string>
     <string name="onboarding_title_fourth">Sehat &amp; Terkontrol</string>

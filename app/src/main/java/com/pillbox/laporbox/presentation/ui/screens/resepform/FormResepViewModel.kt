@@ -73,9 +73,8 @@ class FormResepViewModel(
         }
     }
 
-    // --- Semua fungsi on...Change Anda ---
     fun onNamaDokterChange(nama: String) { _uiState.update { it.copy(namaDokter = nama) } }
-    fun onEmailFaskesChange(email: String) { _uiState.update { it.copy(emailFaskes = email) } }
+    fun onEmailFaskesChange(email: String) { _uiState.update  { it.copy(emailFaskes = email) } }
     fun onTanggalKontrolTerakhirChange(tanggal: String) { _uiState.update { it.copy(tanggalKontrolTerakhir = tanggal) } }
     fun onTanggalKontrolBerikutnyaChange(tanggal: String) { _uiState.update { it.copy(tanggalKontrolBerikutnya = tanggal) } }
     fun onPenyakitSelected(penyakit: String) { _uiState.update { it.copy(penyakit = penyakit) } }

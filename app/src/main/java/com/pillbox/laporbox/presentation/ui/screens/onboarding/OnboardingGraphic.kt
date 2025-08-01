@@ -1,11 +1,14 @@
 package com.pillbox.laporbox.presentation.ui.screens.onboarding
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -25,10 +27,14 @@ import com.pillbox.laporbox.domain.models.OnboardingModel
 
 @Composable
 fun OnboardingGraphic(onboardingModel: OnboardingModel) {
-
+    // Bungkus semua konten di dalam Column yang bisa di-scroll
     Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()) // <-- KUNCI PERBAIKANNYA DI SINI
+            .padding(horizontal = 24.dp), // Beri padding agar tidak terlalu mepet
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center // Pusatkan konten jika muat dalam layar
     ) {
         Spacer(modifier = Modifier.height(80.dp))
 
@@ -43,24 +49,22 @@ fun OnboardingGraphic(onboardingModel: OnboardingModel) {
 
         Text(
             text = stringResource(id = onboardingModel.title),
-            modifier = Modifier.padding(horizontal = 24.dp),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineSmall,
             color = Color.White
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-
         onboardingModel.description?.let { descriptionResId ->
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(id = descriptionResId),
-                modifier = Modifier.padding(horizontal = 32.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White.copy(alpha = 0.8f)
             )
         }
+
+        // Spacer di bawah agar ada ruang saat scroll sampai akhir
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }

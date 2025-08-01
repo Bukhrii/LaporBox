@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,7 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.pillbox.laporbox.R
 import com.pillbox.laporbox.presentation.ui.components.BackButtonIconOnprimary
 import com.pillbox.laporbox.presentation.ui.components.Button
@@ -31,39 +27,37 @@ fun MulaiFormScreen(
     navController: NavController,
     viewModel: FormResepViewModel
 ) {
-    Column (
+    // Gunakan Box untuk menempatkan tombol kembali di pojok kiri atas
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.primary)
-            .verticalScroll(rememberScrollState())
     ) {
-
         BackButtonIconOnprimary(onClick = { navController.popBackStack() })
 
+        // Gunakan satu Column untuk memusatkan semua konten lainnya
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
             modifier = Modifier
-            .fillMaxSize()
-            .padding(50.dp)) {
+                .fillMaxSize()
+                .padding(horizontal = 32.dp), // Beri padding horizontal
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center // Atur agar konten rata tengah vertikal
+        ) {
             Text(
-                text = stringResource( R.string.mulai_form),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                text = stringResource(R.string.mulai_form),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.padding(16.dp))
+            Spacer(modifier = Modifier.padding(24.dp))
 
             Button(
-                    text = stringResource(R.string.button_start),
-                    onClick = {
-                        navController.navigate(Screen.FormDokter.route)
-                    },
-                    modifier = Modifier.fillMaxWidth()
+                text = stringResource(R.string.button_start),
+                onClick = {
+                    navController.navigate(Screen.FormDokter.route)
+                },
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

@@ -31,7 +31,16 @@ fun FormPenyakitScreen(
     val state by viewModel.uiState.collectAsState()
 
     Scaffold(
-        topBar = { /* ... TopAppBar seperti biasa ... */ }
+        topBar = {
+            TopAppBar(
+                title = { },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali")
+                    }
+                }
+            )
+        }
     ) { paddingValues ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -112,7 +121,7 @@ fun SelectableOptionCard(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.White
+    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
     val contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
     val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.LightGray
 

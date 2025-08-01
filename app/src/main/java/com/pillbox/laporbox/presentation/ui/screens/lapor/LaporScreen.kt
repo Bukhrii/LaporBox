@@ -52,15 +52,15 @@ fun LaporScreen(
         }
     }
 
+    // Perubahan pesan Toast agar lebih sesuai dengan alur baru
     LaunchedEffect(state.uploadStatus) {
         when (state.uploadStatus) {
             UploadStatus.SUCCESS -> {
-                Toast.makeText(context, "Laporan berhasil dikirim!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Laporan disimpan dan akan segera diunggah.", Toast.LENGTH_SHORT).show()
                 navController.popBackStack()
             }
             UploadStatus.ERROR -> {
                 Toast.makeText(context, "Error: ${state.errorMessage}", Toast.LENGTH_LONG).show()
-                // Reset status agar pengguna bisa mencoba lagi
                 viewModel.resetStatus()
             }
             else -> {}
@@ -89,12 +89,14 @@ fun LaporScreen(
                 verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (state.uploadStatus == UploadStatus.UPLOADING) {
+                // --- PERBAIKAN DI SINI ---
+                // Mengganti UPLOADING menjadi SAVING agar sesuai dengan ViewModel
+                if (state.uploadStatus == UploadStatus.SAVING) {
                     CircularProgressIndicator(color = Color.White)
                 } else {
                     Button(
                         onClick = {
-                            viewModel.takePhotoAndValidate(
+                            viewModel.takePhotoAndQueueForUpload(
                                 context = context,
                                 imageCapture = imageCapture,
                                 executor = ContextCompat.getMainExecutor(context),

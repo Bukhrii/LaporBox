@@ -23,7 +23,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-// State untuk melacak status pengiriman email
 enum class EmailSendStatus { IDLE, SENDING, SUCCESS, ERROR }
 
 class HomeViewModel(
@@ -33,8 +32,6 @@ class HomeViewModel(
     private val emailRepository: EmailRepository
 ) : ViewModel() {
 
-    // Flow ini sekarang terhubung langsung ke stream real-time Firestore melalui repository.
-    // UI akan diperbarui secara otomatis saat login, logout, atau saat ada perubahan data.
     val reseps: StateFlow<List<ResepModel>> = resepRepository.getReseps()
         .stateIn(
             scope = viewModelScope,
@@ -48,13 +45,11 @@ class HomeViewModel(
     private val _isLoadingLaporan = MutableStateFlow(true)
     val isLoadingLaporan = _isLoadingLaporan.asStateFlow()
 
-    // State baru untuk status pengiriman rekap email
+
     private val _rekapEmailStatus = MutableStateFlow(EmailSendStatus.IDLE)
     val rekapEmailStatus = _rekapEmailStatus.asStateFlow()
 
     init {
-        // Logika untuk mengambil riwayat laporan akan berjalan secara reaktif
-        // setiap kali `reseps` mendapatkan data baru.
         viewModelScope.launch {
             reseps.collect { resepList ->
                 val firstResepId = resepList.firstOrNull()?.id

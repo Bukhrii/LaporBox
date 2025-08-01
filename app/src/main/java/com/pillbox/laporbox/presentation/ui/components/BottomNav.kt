@@ -1,5 +1,6 @@
 package com.pillbox.laporbox.presentation.ui.components
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,15 +26,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.pillbox.laporbox.presentation.ui.navigation.RESEP_ROUTE
 import com.pillbox.laporbox.presentation.ui.navigation.Screen
 
 @Composable
 fun BottomNavigation(navController: NavController, resepIdForLaporan: String) {
-
+    val context = LocalContext.current
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -71,15 +74,18 @@ fun BottomNavigation(navController: NavController, resepIdForLaporan: String) {
         }
 
         FloatingActionButton(onClick = {
-            if (resepIdForLaporan.isNotBlank()) {
-                navController.navigate("lapor_screen/$resepIdForLaporan")
+            if (resepIdForLaporan.isBlank()) {
+                navController.navigate(RESEP_ROUTE)
+            }
+            else {
+                Toast.makeText(context, "Cuman 1 resep untuk Hipertensi", Toast.LENGTH_SHORT).show()
             }
         },
             shape = CircleShape,
             containerColor = MaterialTheme.colorScheme.primary,
             modifier = Modifier.offset(y = (-40).dp)
         ) {
-            Icon(imageVector = Icons.Filled.CameraAlt,
+            Icon(imageVector = Icons.Filled.Add,
                 contentDescription = null,
                 tint = Color.White)
         }

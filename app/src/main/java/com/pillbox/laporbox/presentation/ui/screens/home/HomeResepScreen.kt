@@ -33,24 +33,22 @@ fun HomeResepScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Tombol untuk menambah resep baru
-        Text(
-            text = "Tambah resep obat",
-            modifier = Modifier.clickable {
-                // Navigasi ke alur form tanpa resepId (mode CREATE)
-                navController.navigate(RESEP_ROUTE)
-            },
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+//        Text(
+//            text = "Tambah resep obat",
+//            modifier = Modifier.clickable {
+//                navController.navigate(RESEP_ROUTE)
+//            },
+//            color = MaterialTheme.colorScheme.primary,
+//            fontWeight = FontWeight.Bold
+//        )
+//        Spacer(modifier = Modifier.height(16.dp))
 
         if (resepList.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("Belum ada resep. Silakan tambahkan.")
             }
         } else {
-            // Daftar resep
+            Spacer(modifier = Modifier.height(8.dp))
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(items = resepList, key = { it.id }) { resep ->
                     ResepItem(
@@ -61,7 +59,6 @@ fun HomeResepScreen(
                         onLaporClick = {
                             navController.navigate("lapor_screen/${resep.id}")
                         },
-                        // Hubungkan onDeleteClick ke fungsi di ViewModel
                         onDeleteClick = {
                             viewModel.deleteResep(resep)
                         }
@@ -108,24 +105,25 @@ private fun ResepItem(
             Text("Nama Anggota Keluarga", style = MaterialTheme.typography.labelMedium)
             Text(resep.namaKeluarga, style = MaterialTheme.typography.bodyLarge)
 
-            // Hanya ada satu baris tombol di sini
+            Spacer(modifier = Modifier.height(14.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Tombol Lapor Foto
-//                TextButton(onClick = onLaporClick) {
-//                    Text("Lapor Foto")
-//                }
-                // Tombol Hapus
+
+                TextButton(onClick = onLaporClick) {
+                    Text("Lapor Foto")
+                }
+
+
                 OutlinedButton(onClick = onDeleteClick) {
                     Text("Hapus")
                 }
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Spacer(modifier = Modifier.width(8.dp))
-                // Tombol Edit
+
                 Button(onClick = onEditClick) {
                     Icon(Icons.Default.Edit, contentDescription = "Edit", modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))

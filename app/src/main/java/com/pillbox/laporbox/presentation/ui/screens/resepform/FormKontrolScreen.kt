@@ -2,6 +2,8 @@ package com.pillbox.laporbox.presentation.ui.screens.resepform
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -63,6 +65,7 @@ fun FormKontrolScreen(
                 .padding(paddingValues)
                 .padding(horizontal = 24.dp)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
             // Spacer untuk menengahkan konten (jika diinginkan)
             Spacer(modifier = Modifier.weight(1f))
@@ -95,7 +98,7 @@ fun FormKontrolScreen(
                 datePickerState = nextControlDateState
             )
 
-            Spacer(modifier = Modifier.weight(1f)) // Spacer untuk mendorong tombol ke bawah
+            Spacer(modifier = Modifier.padding(16.dp)) // Spacer untuk mendorong tombol ke bawah
 
             Row(
                 modifier = Modifier

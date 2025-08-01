@@ -18,8 +18,8 @@ android {
         applicationId = "com.pillbox.laporbox"
         minSdk = 27
         targetSdk = 36
-        versionCode = 28072501
-        versionName = "1.1"
+        versionCode = 1082501
+        versionName = "1.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         val localProperties = Properties()
@@ -33,7 +33,7 @@ android {
         buildConfigField("String", "CLOUDINARY_API_KEY", "\"${localProperties.getProperty("cloudinary.apiKey")}\"")
         buildConfigField("String", "CLOUDINARY_API_SECRET", "\"${localProperties.getProperty("cloudinary.apiSecret")}\"")
         buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("gemini.apiKey")}\"")
-        buildConfigField("String", "RESEND_API_KEY", "\"${localProperties.getProperty("resend.apiKey")}\"")
+        buildConfigField("String", "BREVO_API_KEY", "\"${localProperties.getProperty("brevo.apiKey")}\"")
     }
 
     buildTypes {

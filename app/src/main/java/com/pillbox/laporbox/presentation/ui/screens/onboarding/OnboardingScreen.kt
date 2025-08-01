@@ -36,52 +36,41 @@ fun OnboardingScreen(
     val pagerState = rememberPagerState(initialPage = 0) { pages.size }
     val scope = rememberCoroutineScope()
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.primary)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.weight(1f)
-            ) { pageIndex ->
-                OnboardingGraphic(onboardingModel = pages.getOrNull(pageIndex) ?: OnboardingModel.FirstPages)
-            }
+        // Pager mengambil sisa ruang yang tersedia
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.weight(1f)
+        ) { pageIndex ->
+            OnboardingGraphic(onboardingModel = pages.getOrNull(pageIndex) ?: OnboardingModel.FirstPages)
+        }
 
-            if (pagerState.currentPage == pages.lastIndex) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Button(
-                        text = "Mulai",
-                        onClick = {
-                            viewModel.finishOnboarding()
-                            onFinish()
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 24.dp),
-                    contentAlignment = Alignment.BottomEnd // Align button to the bottom end
-                ) {
-                    Button(
-                        text = "Selanjutnya",
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                            }
+        // Tombol "Mulai" atau "Selanjutnya"
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 32.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            val buttonText = if (pagerState.currentPage == pages.lastIndex) "Mulai" else "Selanjutnya"
+            Button(
+                text = buttonText,
+                onClick = {
+                    if (pagerState.currentPage == pages.lastIndex) {
+                        viewModel.finishOnboarding()
+                        onFinish()
+                    } else {
+                        scope.launch {
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
                         }
-                    )
-                }
-            }
+                    }
+                },
+                modifier = if (pagerState.currentPage == pages.lastIndex) Modifier.fillMaxWidth() else Modifier
+            )
         }
     }
 }

@@ -5,11 +5,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.pillbox.laporbox.MainViewModel
 import com.pillbox.laporbox.data.local.database.AppDatabase
-import com.pillbox.laporbox.data.remote.ResendApiService
+import com.pillbox.laporbox.data.remote.BrevoApiService
 import com.pillbox.laporbox.data.repository.DataStoreRepositoryImpl
 import com.pillbox.laporbox.data.repository.EmailRepositoryImpl
 import com.pillbox.laporbox.data.repository.ResepRepositoryImpl
 import com.pillbox.laporbox.data.repository.UserRepositoryImpl
+import com.pillbox.laporbox.data.worker.LaporanUploadWorker
 import com.pillbox.laporbox.data.worker.SyncResepWorker
 import com.pillbox.laporbox.domain.repository.DataStoreRepository
 import com.pillbox.laporbox.domain.repository.EmailRepository
@@ -25,6 +26,7 @@ import com.pillbox.laporbox.presentation.ui.screens.profile.ProfileViewModel
 import com.pillbox.laporbox.presentation.ui.screens.resepform.FormResepViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.androidx.workmanager.dsl.worker
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -33,12 +35,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 val networkModule = module {
     single {
         Retrofit.Builder()
-            .baseUrl("https://api.resend.com/") // Base URL untuk Resend API
+            .baseUrl("https://api.brevo.com/v3/") // Base URL untuk Resend API
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
     single {
-        get<Retrofit>().create(ResendApiService::class.java)
+        get<Retrofit>().create(BrevoApiService::class.java)
     }
 }
 
@@ -53,6 +55,7 @@ val databaseModule = module {
             .build()
     }
     single { get<AppDatabase>().resepDao() }
+    single { get<AppDatabase>().laporanDao() }
 }
 
 val firebaseModule = module {
@@ -117,10 +120,8 @@ val viewModelModule = module {
     }
     viewModel {
         LaporViewModel(
-            auth = get(),
-            firestore = get(),
-            emailRepository = get(),
-            userRepository = get()
+            LaporanDao = get(),
+            context = androidContext()
         )
     }
     // PASTIKAN BLOK INI ADA
@@ -137,6 +138,27 @@ val viewModelModule = module {
     }
 }
 
+val workerModule = module {
+    worker {
+        SyncResepWorker(
+            appContext = get(),
+            workerParams = get(),
+            resepRepository = get()
+        )
+    }
+    worker {
+        LaporanUploadWorker(
+            context = get(),
+            workerParams = get(),
+            firestore = get(),
+            auth = get(),
+            laporanDao = get(),
+            userRepository = get(),
+            emailRepository = get()
+        )
+    }
+}
+
 // --- DAFTAR SEMUA MODULE ---
 val appModules = listOf(
     networkModule,
@@ -144,5 +166,6 @@ val appModules = listOf(
     firebaseModule,
     repositoryModule,
     useCaseModule,
-    viewModelModule
+    viewModelModule,
+    workerModule
 )

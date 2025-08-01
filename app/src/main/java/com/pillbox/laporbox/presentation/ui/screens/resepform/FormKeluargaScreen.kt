@@ -76,6 +76,7 @@ fun FormKeluargaScreen(
                 .padding(paddingValues)
                 .padding(horizontal = 24.dp)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
 
         ) {
 
@@ -126,7 +127,7 @@ fun FormKeluargaScreen(
             )
 
             // Tombol Navigasi
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.padding(16.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
