@@ -16,6 +16,10 @@ data class ResepModel(
     val emailKeluarga: String = "",
     val namaObat: String = "",
     val frekuensiObat: String = "",
+    val aturanMakan: String = "",
+    val jadwalPengingat: Map<String, String> = emptyMap(),
+    val durasiObat: Int = 30,
+    val jumlahObat: Int = 30,
     @ServerTimestamp
     val createdAt: Date? = null,
     val isSynced: Boolean = false,

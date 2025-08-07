@@ -2,15 +2,25 @@ package com.pillbox.laporbox.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val TextBlack = Color(0xFF2A2A2A)
-val AlmostWhite = Color(0xFFFEFCFD)
-val LightCyan = Color(0xFFB2EBF2)
-val MidCyan = Color(0xFF80DEEA)
-val PrimaryCyan = Color(0xFF4DD0E1)
-val DarkCyan = Color(0xFF00BCD4)
+// Warna Utama dari Desain Baru
+val BrandBlue = Color(0xFF2260FF)
+val TextHeading = Color(0xFF080341) // Ungu tua kebiruan untuk judul
 
+// Warna Sekunder & Latar Belakang
+val NavbarBlue = Color(0xFFF3F6FF)
+val CardBlue = Color(0xFFEBF0FF)
 
-val DarkerCyan = Color(0xFF004F58)
-val DarkError = Color(0xFFB00020)
-val LightErrorContainer = Color(0xFFF9DEDC)
-val OnDarkErrorContainer = Color(0xFF410E0B)
+// Warna Netral
+val SurfaceWhite = Color(0xFFFFFFFF)
+val TextBody = Color(0xFF1D1D1F) // Warna hitam standar untuk body text
+val TextSecondary = Color(0xFF8A8A8E)
+val OutlineGrey = Color(0xFFEBEBEB)
+
+// Warna Aksen
+val AccentRed = Color(0xFFD0021B)
+val AccentGreen = Color(0xFF4CAF50)
+
+// Warna untuk Dark Mode
+val DarkBackground = Color(0xFF10142C) // Versi gelap dari TextHeading
+val DarkSurface = Color(0xFF1C203F)
+val TextWhite = Color(0xFFF0F0F0)

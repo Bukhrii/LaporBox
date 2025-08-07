@@ -52,4 +52,15 @@ class UserRepositoryImpl (
         }
     }
 
+    override suspend fun updateUserReminders(uid: String, reminders: Map<String, String>): Resource<Unit> {
+        return try {
+            firestore.collection(USERS_COLLECTION).document(uid)
+                .update("pengingat", reminders).await()
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Resource.Error(e.message ?: "Gagal memperbarui data pengingat.")
+        }
+    }
+
 }

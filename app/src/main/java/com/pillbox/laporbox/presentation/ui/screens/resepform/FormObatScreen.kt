@@ -1,154 +1,157 @@
 package com.pillbox.laporbox.presentation.ui.screens.resepform
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.pillbox.laporbox.R
+import com.pillbox.laporbox.presentation.ui.components.FormDropdown
+import com.pillbox.laporbox.presentation.ui.components.FormHeader
 import com.pillbox.laporbox.presentation.ui.navigation.Screen
+import com.pillbox.laporbox.presentation.ui.theme.CardBlue
+import com.pillbox.laporbox.presentation.ui.theme.TextHeading
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormObatScreen(
     navController: NavController,
     viewModel: FormResepViewModel
 ) {
     val state by viewModel.uiState.collectAsState()
+    val frekuensiOptions = listOf("1x sehari", "2x sehari", "3x sehari")
+    val aturanMakanOptions = listOf("Sebelum Makan", "Sesudah Makan")
 
-    var isExpanded by remember { mutableStateOf(false) }
-    val frekuensiOptions = listOf("1x sehari", "2x sehari", "3x sehari", "Sesuai kebutuhan")
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            TopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali")
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(paddingValues)
-                .padding(horizontal = 24.dp)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-
-            Spacer(modifier = Modifier.height(16.dp))
-
+            FormHeader(onBackClick = { navController.popBackStack() })
             Text(
-                text = stringResource(R.string.obat_form_headline),
-                style = MaterialTheme.typography.headlineSmall,
-                textAlign = TextAlign.Center
+                text = "Obat Yang Dikonsumsi",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.displayMedium,
+                color = Color.White,
+                lineHeight = MaterialTheme.typography.displayMedium.fontSize * 1,
+                modifier = Modifier.padding(start = 26.dp, end = 26.dp, top = 56.dp, bottom = 0.dp)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            ElevatedCard(
+                colors = CardDefaults.cardColors(
+                    CardBlue, contentColor = CardBlue
+                ),
+                shape = RoundedCornerShape(topEnd = 40.dp, topStart = 40.dp),
+                elevation = CardDefaults.elevatedCardElevation(16.dp),
 
-            Text(
-                text = stringResource(R.string.obat_form_description),
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            OutlinedTextField(
-                value = state.namaObat,
-                onValueChange = { viewModel.onNamaObatChange(it) },
-                label = { Text(stringResource(R.string.obat_form_name)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            ExposedDropdownMenuBox(
-                expanded = isExpanded,
-                onExpandedChange = { isExpanded = it },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = state.frekuensiObat,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text(stringResource(R.string.obat_form_frequency)) },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
-                    },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                )
-
-                ExposedDropdownMenu(
-                    expanded = isExpanded,
-                    onDismissRequest = { isExpanded = false }
-                ) {
-                    frekuensiOptions.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option) },
-                            onClick = {
-                                viewModel.onFrekuensiObatChange(option)
-                                isExpanded = false
-                            }
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.padding(16.dp))
-            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .align(Alignment.BottomCenter)
             ) {
-                OutlinedButton(onClick = { navController.popBackStack() }) {
-                    Text("Sebelumnya")
-                }
-                Button(onClick = { navController.navigate(Screen.FormDetail.route) }) {
-                    Text("Selanjutnya")
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 36.dp)
+                ) {
+                    Spacer(modifier = Modifier.padding(16.dp))
+                    Text(
+                        text = stringResource(R.string.obat_form_name),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = TextHeading,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = state.namaObat,
+                        onValueChange = { viewModel.onNamaObatChange(it) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                            unfocusedLabelColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                        ),
+                        label = { Text(stringResource(R.string.obat_form_hint_name)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = stringResource(R.string.obat_form_frequency),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = TextHeading,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    FormDropdown(
+                        label = stringResource(R.string.obat_form_hint_frequency),
+                        options = frekuensiOptions,
+                        selectedValue = state.frekuensiObat,
+                        onValueSelected = { viewModel.onFrekuensiObatChange(it) }
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Waktu Minum Obat",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = TextHeading,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    FormDropdown(
+                        label = "Pilih waktu minum obat",
+                        options = aturanMakanOptions,
+                        selectedValue = state.aturanMakan,
+                        onValueSelected = { viewModel.onAturanMakanChange(it) }
+                    )
+
+                    Spacer(modifier = Modifier.padding(14.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 32.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        ElevatedButton(
+                            onClick = { navController.navigate(Screen.FormPengingat.route) },
+                            elevation = ButtonDefaults.buttonElevation(12.dp),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Black
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(52.dp)
+                                .padding(horizontal = 60.dp)
+                        ) {
+                            Text(
+                                "Selanjutnya  >",
+                                color = Color.White,
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.padding(10.dp))
                 }
             }
         }

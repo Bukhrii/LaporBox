@@ -1,41 +1,23 @@
 package com.pillbox.laporbox.presentation.ui.navigation
 
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import androidx.navigation.navigation
 import com.pillbox.laporbox.presentation.ui.screens.auth.AuthState
 import com.pillbox.laporbox.presentation.ui.screens.auth.AuthViewModel
 import com.pillbox.laporbox.presentation.ui.screens.auth.LoginScreen
 import com.pillbox.laporbox.presentation.ui.screens.auth.SignupScreen
-import com.pillbox.laporbox.presentation.ui.screens.home.HomeScreen
+import com.pillbox.laporbox.presentation.ui.screens.home.HomeNavGraph
 import com.pillbox.laporbox.presentation.ui.screens.home.HomeViewModel
-import com.pillbox.laporbox.presentation.ui.screens.lapor.LaporScreen
-import com.pillbox.laporbox.presentation.ui.screens.resepform.MulaiFormScreen
 import com.pillbox.laporbox.presentation.ui.screens.onboarding.OnboardingScreen
 import com.pillbox.laporbox.presentation.ui.screens.onboarding.OnboardingViewModel
-import com.pillbox.laporbox.presentation.ui.screens.profile.ProfileScreen
-import com.pillbox.laporbox.presentation.ui.screens.resepform.FormDetailScreen
-import com.pillbox.laporbox.presentation.ui.screens.resepform.FormDokterScreen
-import com.pillbox.laporbox.presentation.ui.screens.resepform.FormKeluargaScreen
-import com.pillbox.laporbox.presentation.ui.screens.resepform.FormKontrolScreen
-import com.pillbox.laporbox.presentation.ui.screens.resepform.FormObatScreen
-import com.pillbox.laporbox.presentation.ui.screens.resepform.FormPenyakitScreen
-import com.pillbox.laporbox.presentation.ui.screens.resepform.FormResepViewModel
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -49,16 +31,17 @@ fun RootNavGraph(
     onboardingViewModel: OnboardingViewModel = koinViewModel()
 ) {
     val navController = rememberNavController()
-
-    val hasCompletedOnboarding by onboardingViewModel.onboardingCompleted.collectAsState(initial = null)
+    val hasCompletedOnboardingState by onboardingViewModel.onboardingCompleted.collectAsState(initial = null)
     val authState by authViewModel.authState.observeAsState()
 
-    if (hasCompletedOnboarding == null || authState == null) {
-        return
+    val localHasCompletedOnboarding = hasCompletedOnboardingState
+
+    if (localHasCompletedOnboarding == null || authState == null) {
+        return // Tunggu state dimuat, splash screen masih aktif
     }
 
     val startDestination = when {
-        hasCompletedOnboarding == false -> Screen.Onboarding.route
+        !localHasCompletedOnboarding -> Screen.Onboarding.route
         authState is AuthState.Authenticated -> MAIN_GRAPH_ROUTE
         else -> AUTH_GRAPH_ROUTE
     }
@@ -79,7 +62,10 @@ fun RootNavGraph(
 
         authNavGraph(navController = navController)
 
-        mainNavGraph(navController = navController)
+        // Setelah login, seluruh kontrol diserahkan ke HomeNavGraph
+        composable(MAIN_GRAPH_ROUTE) {
+            HomeNavGraph(rootNavController = navController)
+        }
     }
 }
 
@@ -111,125 +97,6 @@ fun NavGraphBuilder.authNavGraph(navController: NavController) {
                     navController.popBackStack()
                 }
             )
-        }
-    }
-}
-
-fun NavGraphBuilder.mainNavGraph(navController: NavController) {
-    navigation(
-        route = MAIN_GRAPH_ROUTE,
-        startDestination = Screen.Home.route
-    ) {
-        composable(Screen.Home.route) {
-            HomeScreen(navController = navController)
-        }
-        composable(Screen.Profile.route) {
-            val authViewModel: AuthViewModel = koinViewModel()
-            ProfileScreen(
-                navController = navController,
-                onLogout = {
-                    authViewModel.signOut()
-                    navController.navigate(AUTH_GRAPH_ROUTE) {
-                        popUpTo(MAIN_GRAPH_ROUTE) { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        composable(
-            route = "lapor_screen/{resepId}",
-            arguments = listOf(navArgument("resepId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val resepId = backStackEntry.arguments?.getString("resepId")
-            if (resepId != null) {
-                LaporScreen(navController = navController, resepId = resepId)
-            } else {
-                navController.popBackStack()
-            }
-        }
-
-        formResepNavGraph(navController = navController)
-    }
-}
-
-
-fun NavGraphBuilder.formResepNavGraph(navController: NavController) {
-    navigation(
-        startDestination = Screen.MulaiForm.route,
-        route = "$RESEP_ROUTE?resepId={resepId}",
-        arguments = listOf(navArgument("resepId") {
-            type = NavType.StringType
-            nullable = true
-        })
-    ) {
-
-        composable(Screen.MulaiForm.route) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry("$RESEP_ROUTE?resepId={resepId}")
-            }
-            val viewModel: FormResepViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
-
-            val resepId = backStackEntry.arguments?.getString("resepId")
-
-            LaunchedEffect(key1 = resepId) {
-                viewModel.loadResep(resepId)
-            }
-
-            MulaiFormScreen(navController = navController)
-        }
-
-        composable(Screen.FormDokter.route) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(RESEP_ROUTE)
-            }
-            val viewModel: FormResepViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
-
-            FormDokterScreen(navController, viewModel)
-        }
-
-        composable(Screen.FormKontrol.route) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(RESEP_ROUTE)
-            }
-            val viewModel: FormResepViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
-
-            FormKontrolScreen(navController, viewModel)
-        }
-
-        composable(Screen.FormPenyakit.route) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(RESEP_ROUTE)
-            }
-            val viewModel: FormResepViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
-
-            FormPenyakitScreen(navController, viewModel)
-        }
-
-        composable(Screen.FormKeluarga.route) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(RESEP_ROUTE)
-            }
-            val viewModel: FormResepViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
-
-            FormKeluargaScreen(navController, viewModel)
-        }
-
-        composable(Screen.FormObat.route) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(RESEP_ROUTE)
-            }
-            val viewModel: FormResepViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
-
-            FormObatScreen(navController, viewModel)
-        }
-
-        composable(Screen.FormDetail.route) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(RESEP_ROUTE)
-            }
-            val viewModel: FormResepViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
-
-            FormDetailScreen(navController, viewModel)
         }
     }
 }

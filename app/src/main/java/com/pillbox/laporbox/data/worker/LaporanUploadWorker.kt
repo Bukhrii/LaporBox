@@ -1,7 +1,6 @@
 package com.pillbox.laporbox.data.worker
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import androidx.work.CoroutineWorker
@@ -9,10 +8,6 @@ import androidx.work.WorkerParameters
 import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
-import com.google.firebase.Firebase
-import com.google.firebase.ai.ai
-import com.google.firebase.ai.type.GenerativeBackend
-import com.google.firebase.ai.type.content
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -24,11 +19,8 @@ import com.pillbox.laporbox.domain.models.UserModel
 import com.pillbox.laporbox.domain.repository.EmailRepository
 import com.pillbox.laporbox.domain.repository.UserRepository
 import com.pillbox.laporbox.util.Resource
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import java.io.File
-import java.util.Calendar
 import java.util.Date
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -43,12 +35,11 @@ class LaporanUploadWorker(
     private val emailRepository: EmailRepository
 ) : CoroutineWorker(context, workerParams) {
 
-    private val generativeModel = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel("gemini-1.5-flash")
     private val tag = "LaporanUploadWorker"
 
     override suspend fun doWork(): Result {
         val pendingLaporan = laporanDao.getNextPendingLaporan() ?: run {
-            Log.d(tag, "Tidak ada laporan offline untuk diunggah. Pekerjaan selesai.")
+            Log.d(tag, "Tidak ada laporan yang sudah divalidasi untuk diunggah.")
             return Result.success()
         }
 
@@ -66,32 +57,20 @@ class LaporanUploadWorker(
                 return Result.failure()
             }
 
-            Log.d(tag, "Memulai validasi AI untuk laporan ID: ${pendingLaporan.id}")
-            val validationResult = validateWithAI(Uri.fromFile(imageFile), pendingLaporan.resepId, userId)
-
-            when (validationResult) {
-                "TRUE" -> {
-                    Log.d(tag, "Validasi AI berhasil. Mengunggah gambar ke Cloudinary...")
-                    val imageUrl = uploadToCloudinary(Uri.fromFile(imageFile))
-                    if (imageUrl != null) {
-                        Log.d(tag, "Unggah Cloudinary berhasil. Menyimpan ke Firestore...")
-                        saveToFirestoreAndNotify(imageUrl, pendingLaporan.resepId, userId)
-                        laporanDao.delete(pendingLaporan)
-                        Log.d(tag, "Laporan ID: ${pendingLaporan.id} berhasil diproses dan dihapus dari antrean.")
-                        Result.success()
-                    } else {
-                        Log.e(tag, "Gagal mengunggah ke Cloudinary.")
-                        handleRetry(pendingLaporan)
-                    }
-                }
-                else -> {
-                    Log.w(tag, "Validasi AI gagal untuk laporan ID: ${pendingLaporan.id} dengan alasan: $validationResult. Laporan dihapus.")
-                    laporanDao.delete(pendingLaporan)
-                    Result.failure()
-                }
+            Log.d(tag, "Mengunggah gambar yang sudah divalidasi ke Cloudinary...")
+            val imageUrl = uploadToCloudinary(Uri.fromFile(imageFile))
+            if (imageUrl != null) {
+                Log.d(tag, "Unggah Cloudinary berhasil. Menyimpan ke Firestore...")
+                saveToFirestoreAndNotify(imageUrl, pendingLaporan.resepId, userId)
+                laporanDao.delete(pendingLaporan)
+                Log.d(tag, "Laporan ID: ${pendingLaporan.id} berhasil diunggah dan dihapus dari antrean.")
+                Result.success()
+            } else {
+                Log.e(tag, "Gagal mengunggah ke Cloudinary.")
+                handleRetry(pendingLaporan)
             }
         } catch (e: Exception) {
-            Log.e(tag, "Terjadi error saat memproses laporan ID: ${pendingLaporan.id}", e)
+            Log.e(tag, "Terjadi error saat mengunggah laporan ID: ${pendingLaporan.id}", e)
             handleRetry(pendingLaporan)
         }
     }
@@ -106,35 +85,6 @@ class LaporanUploadWorker(
             Log.w(tag, "Pekerjaan gagal, akan dicoba lagi nanti. Percobaan ke-$newAttemptCount")
             laporanDao.update(laporan.copy(attemptCount = newAttemptCount))
             Result.retry()
-        }
-    }
-
-    private suspend fun validateWithAI(imageUri: Uri, resepId: String, userId: String): String {
-        try {
-            val bitmap = withContext(Dispatchers.IO) {
-                context.contentResolver.openInputStream(imageUri)?.use { BitmapFactory.decodeStream(it) }
-            } ?: return "FALSE_KUALITAS"
-
-            val resepDoc = firestore.collection("users").document(userId).collection("resep").document(resepId).get().await()
-            val resepData = resepDoc.toObject(ResepModel::class.java) ?: return "ERROR_RESEP_TIDAK_DITEMUKAN"
-
-            val laporanHariIni = getLaporanCountForToday(userId, resepId)
-            val dosisHarian = parseFrekuensi(resepData.frekuensiObat)
-
-            if (laporanHariIni >= dosisHarian) {
-                return "ERROR_DOSIS_TERPENUHI"
-            }
-
-            val textPrompt = buildDynamicPrompt(resepData)
-            val prompt = content { image(bitmap); text(textPrompt) }
-            val response = generativeModel.generateContent(prompt)
-            val responseText = response.text?.trim() ?: "ERROR_RESPONS_KOSONG"
-
-            Log.d(tag, "Respon AI: $responseText")
-            return responseText
-        } catch (e: Exception) {
-            Log.e(tag, "Error saat validasi AI:", e)
-            return "ERROR_EXCEPTION"
         }
     }
 
@@ -159,7 +109,6 @@ class LaporanUploadWorker(
         val resepRef = firestore.collection("users").document(userId).collection("resep").document(resepId)
         val userDataResource = userRepository.getUser(userId)
 
-        // Mengambil data resep dan pengguna secara bersamaan
         val resepData = resepRef.get().await().toObject(ResepModel::class.java)
         val user = if (userDataResource is Resource.Success) userDataResource.data else null
 
@@ -222,46 +171,5 @@ class LaporanUploadWorker(
         } else {
             Log.d(tag, "Panggilan API email notifikasi berhasil diinisiasi dari worker.")
         }
-    }
-
-    private fun buildDynamicPrompt(resep: ResepModel): String {
-        val totalDosesTakenPreviously = resep.totalLaporan.toInt()
-        val activeCompartment = (totalDosesTakenPreviously / 3) % 10 + 1
-        val pillsTakenFromActiveCompartment = totalDosesTakenPreviously % 3
-        val expectedPills = 3 - (pillsTakenFromActiveCompartment + 1)
-
-        return """
-        PERAN: Anda adalah AI validator gambar pillbox. Jawab HANYA dengan "TRUE", "FALSE_TIDAK_PATUH", atau "FALSE_KUALITAS".
-    
-        TUGAS ANDA:
-        1. Temukan kompartemen nomor $activeCompartment pada gambar. Urutan: baris bawah (kiri ke kanan), lalu baris atas (kanan ke kiri).
-        2. Hitung jumlah pil HANYA di dalam kompartemen nomor $activeCompartment.
-        3. Jumlah pil yang benar seharusnya adalah $expectedPills.
-    
-        ATURAN RESPON:
-        - Jika kualitas gambar buruk (buram/gelap) sehingga Anda tidak bisa menghitung, JAWAB: "FALSE_KUALITAS".
-        - Jika gambar jelas tetapi jumlah pil di kompartemen $activeCompartment TIDAK SAMA DENGAN $expectedPills, JAWAB: "FALSE_TIDAK_PATUH".
-        - Jika gambar jelas DAN jumlah pil di kompartemen $activeCompartment TEPAT SAMA DENGAN $expectedPills, JAWAB: "TRUE".
-        """.trimIndent()
-    }
-
-    private suspend fun getLaporanCountForToday(userId: String, resepId: String): Int {
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 0); calendar.set(Calendar.MINUTE, 0); calendar.set(Calendar.SECOND, 0)
-        val startOfDay = calendar.time
-        calendar.set(Calendar.HOUR_OF_DAY, 23); calendar.set(Calendar.MINUTE, 59); calendar.set(Calendar.SECOND, 59)
-        val endOfDay = calendar.time
-
-        val query = firestore.collection("users").document(userId)
-            .collection("resep").document(resepId)
-            .collection("laporan")
-            .whereGreaterThanOrEqualTo("timestamp", startOfDay)
-            .whereLessThanOrEqualTo("timestamp", endOfDay)
-            .get().await()
-        return query.size()
-    }
-
-    private fun parseFrekuensi(frekuensi: String): Int {
-        return frekuensi.firstOrNull()?.toString()?.toIntOrNull() ?: 1
     }
 }

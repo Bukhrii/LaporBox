@@ -9,5 +9,5 @@ interface UserRepository {
     suspend fun createUser(user: UserModel): Resource<Unit>
     suspend fun getUser(uid: String): Resource<UserModel>
     suspend fun updateUser(user: UserModel): Resource<Unit>
-
+    suspend fun updateUserReminders(uid: String, reminders: Map<String, String>): Resource<Unit>
 }

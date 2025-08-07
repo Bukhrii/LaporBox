@@ -1,54 +1,31 @@
 package com.pillbox.laporbox.presentation.ui.screens.resepform
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.pillbox.laporbox.R
-import com.pillbox.laporbox.presentation.ui.components.BackButtonIconOnprimary
-import com.pillbox.laporbox.presentation.ui.components.Button
+import com.pillbox.laporbox.presentation.ui.components.FormHeader
 import com.pillbox.laporbox.presentation.ui.navigation.Screen
+import com.pillbox.laporbox.presentation.ui.theme.CardBlue
+import com.pillbox.laporbox.presentation.ui.theme.TextHeading
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormKeluargaScreen(
     navController: NavController,
@@ -56,89 +33,123 @@ fun FormKeluargaScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            TopAppBar(
-                title = {  },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali")
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .padding(paddingValues)
-                .padding(horizontal = 24.dp)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
 
-        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                FormHeader(onBackClick = { navController.popBackStack() })
+                Text(
+                    text = "Keluarga Pendamping",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.displayMedium,
+                    color = Color.White,
+                    lineHeight = MaterialTheme.typography.displayMedium.fontSize * 1,
+                    modifier = Modifier.padding(horizontal = 26.dp)
+                )
 
-            Text(
-                text = stringResource( R.string.keluarga_form_headline),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center
-            )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = stringResource( R.string.keluarga_form_description),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center
-            )
+                Image(
+                    painter = painterResource(id = R.drawable.hand),
+                    contentDescription = "Hand Background",
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
 
-            OutlinedTextField(
-                value = state.namaKeluarga,
-                onValueChange = { viewModel.onNamaKeluargaChange(it) },
-                label = { Text(stringResource(R.string.keluarga_form_name)) },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    focusedLabelColor = MaterialTheme.colorScheme.primary
+            ElevatedCard(
+                colors = CardDefaults.cardColors(
+                    CardBlue, contentColor = CardBlue
                 ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                modifier = Modifier.fillMaxWidth()
-            )
+                shape = RoundedCornerShape(topEnd = 40.dp, topStart = 40.dp),
+                elevation = CardDefaults.elevatedCardElevation(16.dp),
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = state.emailKeluarga,
-                onValueChange = { viewModel.onEmailKeluargaChange(it) },
-                label = { Text(stringResource(R.string.keluarga_form_email)) },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    focusedLabelColor = MaterialTheme.colorScheme.primary
-                ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Tombol Navigasi
-            Spacer(modifier = Modifier.padding(16.dp))
-            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .align(Alignment.BottomCenter)
             ) {
-                OutlinedButton(onClick = { navController.popBackStack() }) {
-                    Text("Sebelumnya")
-                }
-                Button(onClick = { navController.navigate(Screen.FormObat.route) }) {
-                    Text("Selanjutnya")
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 36.dp)
+                ) {
+                    Spacer(modifier = Modifier.padding(16.dp))
+                    Text(
+                        text = stringResource(R.string.keluarga_form_name),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = TextHeading,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = state.namaKeluarga,
+                        onValueChange = { viewModel.onNamaKeluargaChange(it) },
+                        label = { Text(stringResource(R.string.keluarga_form_hint_name)) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                            unfocusedLabelColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = stringResource(R.string.keluarga_form_email),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = TextHeading,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = state.emailKeluarga,
+                        onValueChange = { viewModel.onEmailKeluargaChange(it) },
+                        label = { Text(stringResource(R.string.keluarga_form_hint_email)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                            unfocusedLabelColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.padding(14.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 32.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        ElevatedButton(
+                            onClick = { navController.navigate(Screen.FormObat.route) },
+                            elevation = ButtonDefaults.buttonElevation(12.dp),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Black
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(52.dp)
+                                .padding(horizontal = 60.dp)
+                        ) {
+                            Text(
+                                "Selanjutnya  >",
+                                color = Color.White,
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.padding(10.dp))
                 }
             }
         }

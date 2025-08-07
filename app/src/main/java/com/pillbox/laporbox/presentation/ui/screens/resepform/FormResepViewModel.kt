@@ -27,6 +27,8 @@ data class FormResepState(
     val emailKeluarga: String = "",
     val namaObat: String = "",
     val frekuensiObat: String = "",
+    val aturanMakan: String = "",
+    val jadwalPengingat: List<String> = listOf("07:00"),
     val saveStatus: SaveStatus = SaveStatus.IDLE,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
@@ -81,12 +83,39 @@ class FormResepViewModel(
     fun onNamaKeluargaChange(nama: String) { _uiState.update { it.copy(namaKeluarga = nama) } }
     fun onEmailKeluargaChange(email: String) { _uiState.update { it.copy(emailKeluarga = email) } }
     fun onNamaObatChange(nama: String) { _uiState.update { it.copy(namaObat = nama) } }
-    fun onFrekuensiObatChange(frekuensi: String) { _uiState.update { it.copy(frekuensiObat = frekuensi) } }
+    fun onFrekuensiObatChange(frekuensi: String) {
+        val defaultTimes = when (frekuensi) {
+            "1x sehari" -> listOf("07:00")
+            "2x sehari" -> listOf("07:00", "19:00")
+            "3x sehari" -> listOf("07:00", "13:00", "19:00")
+            else -> emptyList()
+        }
+        _uiState.update {
+            it.copy(
+                frekuensiObat = frekuensi,
+                jadwalPengingat = defaultTimes
+            )
+        }
+    }
+    fun onAturanMakanChange(aturan: String) { _uiState.update { it.copy(aturanMakan = aturan) } }
+
+    fun onTimeChanged(index: Int, time: String) {
+        _uiState.update { currentState ->
+            val updatedJadwal = currentState.jadwalPengingat.toMutableList()
+            if (index < updatedJadwal.size) {
+                updatedJadwal[index] = time
+            }
+            currentState.copy(jadwalPengingat = updatedJadwal)
+        }
+    }
 
     fun saveOrUpdateResep() {
         viewModelScope.launch {
             _uiState.update { it.copy(saveStatus = SaveStatus.LOADING) }
             val currentState = _uiState.value
+            val jadwalPengingatMap = currentState.jadwalPengingat.mapIndexed { index, time ->
+                "waktu_${index + 1}" to time
+            }.toMap()
 
             val resepModel = ResepModel(
                 id = currentState.resepId ?: "",
@@ -99,7 +128,9 @@ class FormResepViewModel(
                 namaKeluarga = currentState.namaKeluarga,
                 emailKeluarga = currentState.emailKeluarga,
                 namaObat = currentState.namaObat,
-                frekuensiObat = currentState.frekuensiObat
+                frekuensiObat = currentState.frekuensiObat,
+                aturanMakan = currentState.aturanMakan,
+                jadwalPengingat = jadwalPengingatMap
             )
 
             val result = if (currentState.formMode == FormMode.CREATE) {

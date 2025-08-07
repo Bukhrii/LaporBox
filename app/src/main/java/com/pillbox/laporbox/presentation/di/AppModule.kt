@@ -23,6 +23,7 @@ import com.pillbox.laporbox.presentation.ui.screens.home.HomeViewModel
 import com.pillbox.laporbox.presentation.ui.screens.lapor.LaporViewModel
 import com.pillbox.laporbox.presentation.ui.screens.onboarding.OnboardingViewModel
 import com.pillbox.laporbox.presentation.ui.screens.profile.ProfileViewModel
+import com.pillbox.laporbox.presentation.ui.screens.resep.ResepDetailViewModel
 import com.pillbox.laporbox.presentation.ui.screens.resepform.FormResepViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -95,7 +96,6 @@ val viewModelModule = module {
             resepRepository = get(),
             auth = get(),
             userRepository = get(),
-            emailRepository = get(),
         )
     }
     viewModel {
@@ -112,13 +112,15 @@ val viewModelModule = module {
     viewModel {
         OnboardingViewModel(
             saveOnboardingUseCase = get(),
-            readOnboardingUseCase = get()
+            readOnboardingUseCase = get(),
         )
     }
     viewModel {
         LaporViewModel(
-            LaporanDao = get(),
-            context = androidContext()
+            laporanDao = get(),
+            context = androidContext(),
+            firestore = get(),
+            auth = get()
         )
     }
     viewModel {
@@ -130,6 +132,15 @@ val viewModelModule = module {
         ProfileViewModel(
             auth = get(),
             userRepository = get()
+        )
+    }
+    viewModel {
+        ResepDetailViewModel(
+            userRepository = get(),
+            emailRepository = get(),
+            firestore = get(),
+            auth = get(),
+            savedStateHandle = get()
         )
     }
 }

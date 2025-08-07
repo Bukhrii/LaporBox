@@ -1,143 +1,131 @@
 package com.pillbox.laporbox.presentation.ui.screens.resepform
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.border
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.pillbox.laporbox.R
+import com.pillbox.laporbox.presentation.ui.components.FormDropdown
+import com.pillbox.laporbox.presentation.ui.components.FormHeader
 import com.pillbox.laporbox.presentation.ui.navigation.Screen
+import com.pillbox.laporbox.presentation.ui.theme.CardBlue
+import com.pillbox.laporbox.presentation.ui.theme.TextHeading
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormPenyakitScreen(
     navController: NavController,
     viewModel: FormResepViewModel
 ) {
     val state by viewModel.uiState.collectAsState()
+    val daftarPenyakit = listOf("Hipertensi")
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali")
-                    }
-                }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(id = R.drawable.heart),
+                contentDescription = "Heart Background",
+                modifier = Modifier.width(300.dp).align(Alignment.TopEnd),
             )
-        }
-    ) { paddingValues ->
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .padding(paddingValues)
-                .padding(horizontal = 24.dp)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
+
+            FormHeader(onBackClick = { navController.popBackStack() })
             Text(
-                stringResource(R.string.penyakit_form_headline),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                text = "Penyakit Yang Sedang Diobati",
+                textAlign = TextAlign.Left,
+                style = MaterialTheme.typography.displayMedium,
+                color = Color.White,
+                lineHeight = MaterialTheme.typography.displayMedium.fontSize * 1,
+                modifier = Modifier.padding(end = 186.dp, start = 26.dp, top = 56.dp, bottom = 0.dp)
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(stringResource(R.string.penyakit_form_description), textAlign = TextAlign.Center)
-            Spacer(modifier = Modifier.height(32.dp))
 
-            // Opsi Pilihan
-//            SelectableOptionCard(
-//                text = stringResource(R.string.tbc),
-//                isSelected = state.penyakit == "TBC",
-//                onClick = { viewModel.onPenyakitSelected("TBC") }
-//            )
-//            Spacer(modifier = Modifier.height(16.dp))
-            SelectableOptionCard(
-                text = stringResource(R.string.hipertensi),
-                isSelected = state.penyakit == "Hipertensi",
-                onClick = { viewModel.onPenyakitSelected("Hipertensi") }
-            )
-//            Spacer(modifier = Modifier.height(16.dp))
-//            SelectableOptionCard(
-//                text = stringResource(R.string.lainnya),
-//                isSelected = state.penyakit == "Lainnya",
-//                onClick = { viewModel.onPenyakitSelected("Lainnya") }
-//            )
-//
-//            // Input manual jika "Lainnya" dipilih
-//            AnimatedVisibility(visible = state.penyakit == "Lainnya") {
-//                Column(modifier = Modifier.padding(top = 24.dp)) {
-//                    Text("Silakan isi secara manual jika jenis penyakitmu belum ada di daftar")
-//                    Spacer(modifier = Modifier.height(8.dp))
-//                    OutlinedTextField(
-//                        value = state.penyakitLainnya,
-//                        onValueChange = { viewModel.onPenyakitLainnyaChange(it) },
-//                        modifier = Modifier.fillMaxWidth(),
-//                        placeholder = { Text("Ketikkan di sini") }
-//                    )
-//                }
-//            }
+            ElevatedCard(
+                colors = CardDefaults.cardColors(
+                    CardBlue, contentColor = CardBlue
+                ),
+                shape = RoundedCornerShape(topEnd = 40.dp, topStart = 40.dp),
+                elevation = CardDefaults.elevatedCardElevation(16.dp),
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .align(Alignment.BottomCenter)
             ) {
-                OutlinedButton(onClick = { navController.popBackStack() }) {
-                    Text(stringResource(R.string.button_back))
-                }
-                Button(onClick = { navController.navigate(Screen.FormKeluarga.route) }) {
-                    Text(stringResource(R.string.button_next))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 36.dp)
+                ) {
+                    Spacer(modifier = Modifier.padding(16.dp))
+
+
+                    Text(
+                        text = "Nama Penyakit",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = TextHeading,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    FormDropdown(
+                        label = "Pilih nama penyakit",
+                        options = daftarPenyakit,
+                        selectedValue = state.penyakit,
+                        onValueSelected = { penyakitTerpilih ->
+                            viewModel.onPenyakitSelected(penyakitTerpilih)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.padding(14.dp))
+
+                    Spacer(modifier = Modifier.padding(16.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 32.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        ElevatedButton(
+                            onClick = { navController.navigate(Screen.FormKeluarga.route) },
+                            elevation = ButtonDefaults.buttonElevation(12.dp),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Black
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(52.dp)
+                                .padding(horizontal = 60.dp)
+                        ) {
+                            Text(
+                                "Selanjutnya  >",
+                                color = Color.White,
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.padding(10.dp))
                 }
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SelectableOptionCard(
-    text: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
-    val contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.LightGray
-
-    Card(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, borderColor, MaterialTheme.shapes.medium),
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = backgroundColor)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(text = text, color = contentColor, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
         }
     }
 }

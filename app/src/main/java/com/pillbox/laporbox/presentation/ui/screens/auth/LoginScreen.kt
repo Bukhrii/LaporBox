@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,7 +27,11 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +50,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -52,12 +60,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.pillbox.laporbox.R
 import com.pillbox.laporbox.presentation.ui.screens.home.HomeViewModel
+import com.pillbox.laporbox.presentation.ui.theme.BrandBlue
+import com.pillbox.laporbox.presentation.ui.theme.CardBlue
+import com.pillbox.laporbox.presentation.ui.theme.TextHeading
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(
     authViewModel: AuthViewModel = koinViewModel(),
-    homeViewModel: HomeViewModel = koinViewModel(), // Tambahkan HomeViewModel
+    homeViewModel: HomeViewModel = koinViewModel(),
     onLoginSuccess: () -> Unit,
     onNavigateToSignUp: () -> Unit
 ) {
@@ -68,6 +79,13 @@ fun LoginScreen(
 
     val authState by authViewModel.authState.observeAsState()
     val context = LocalContext.current
+
+    val backgroundGradient = Brush.verticalGradient(
+        colors = listOf(
+            BrandBlue.copy(alpha = 0.95f),
+            Color.White
+        )
+    )
 
     LaunchedEffect(authState) {
         when (val state = authState) {
@@ -84,124 +102,163 @@ fun LoginScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
-            .padding(30.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(brush = backgroundGradient),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
     ) {
-
-        Text(
-            text = stringResource(id = R.string.sign_in),
-            modifier = Modifier
-                .fillMaxWidth(),
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(modifier = Modifier.padding(10.dp))
-
-        OutlinedTextField(
-            value = textEmail,
-            onValueChange = { textEmail = it },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Filled.Email,
-                    contentDescription = stringResource(id = R.string.email),
-                    modifier = Modifier.size(30.dp)
-                )
-            },
-            label = { Text(stringResource(R.string.email)) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                focusedLabelColor = MaterialTheme.colorScheme.primary
-            ),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.padding(4.dp))
-
-        OutlinedTextField(
-            value = textPassword,
-            onValueChange = { textPassword = it },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Filled.Lock,
-                    contentDescription = stringResource(id = R.string.password),
-                    modifier = Modifier.size(30.dp)
-                )
-            },
-            label = { Text(stringResource(R.string.password)) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                focusedLabelColor = MaterialTheme.colorScheme.primary
-            ),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                val image =
-                    if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-
-                val description = if (passwordVisible) "Hide password" else "Show password"
-
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, description)
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.padding(14.dp))
-
-        Button(
-            onClick = {
-                authViewModel.login(textEmail, textPassword)
-            },
-            enabled = authState !is AuthState.Loading,
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-        ) {
-            if (authState is AuthState.Loading) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(24.dp),
-                    strokeWidth = 2.dp
-                )
-            } else {
-                Text(text = stringResource(R.string.sign_in))
-            }
-        }
-
-        Spacer(modifier = Modifier.padding(14.dp))
-
-        Row(horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()) {
-            Text(
-                stringResource(R.string.dont_have_account_text),
-                color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 14.sp
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(id = R.drawable.authbackground),
+                contentDescription = "Onboarding Background",
+                modifier = Modifier.fillMaxWidth(),
             )
-            TextButton(
-                onClick = {
-                    onNavigateToSignUp()
-                }
+
+            ElevatedCard(
+                colors = CardDefaults.cardColors(CardBlue, contentColor = CardBlue
+                ),
+                shape = RoundedCornerShape(topEnd = 40.dp, topStart = 40.dp),
+                elevation = CardDefaults.elevatedCardElevation(16.dp),
+
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
             ) {
-                Text(
-                    text = stringResource(R.string.create_now_text),
-                    color = MaterialTheme.colorScheme.primary,
-                    fontSize = 14.sp
-                )
+
+                Spacer(modifier = Modifier.padding(16.dp))
+
+                Column (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 36.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.email),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = TextHeading,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = textEmail,
+                        onValueChange = { textEmail = it },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.Email,
+                                contentDescription = stringResource(id = R.string.email),
+                                tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                                modifier = Modifier.size(30.dp)
+                            )
+                        },
+                        label = { Text("Ketikkan nama email") },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                            unfocusedLabelColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                        ),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.padding(12.dp))
+
+                    Text(
+                        text = stringResource(R.string.password),
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Start,
+                        color = TextHeading,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = textPassword,
+                        onValueChange = { textPassword = it },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.Lock,
+                                contentDescription = stringResource(id = R.string.password),
+                                tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                                modifier = Modifier.size(30.dp)
+                            )
+                        },
+                        label = { Text("Ketikkan kata sandi") },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                            unfocusedLabelColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                        ),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            val image =
+                                if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+
+                            val description = if (passwordVisible) "Hide password" else "Show password"
+
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(imageVector = image, description, tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f))
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.padding(14.dp))
+
+                    ElevatedButton(
+                        onClick = {
+                            authViewModel.login(textEmail, textPassword)
+                        },
+                        elevation = ButtonDefaults.buttonElevation(12.dp),
+                        enabled = authState !is AuthState.Loading,
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                            .padding(horizontal = 90.dp)
+                    ) {
+                        if (authState is AuthState.Loading) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.size(24.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(
+                                text = stringResource(R.string.sign_in),
+                                color = Color.Black,
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.padding(14.dp))
+
+                    Row(horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            stringResource(R.string.dont_have_account_text),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 14.sp
+                        )
+                        TextButton(
+                            onClick = {
+                                onNavigateToSignUp()
+                            }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.create_now_text),
+                                color = MaterialTheme.colorScheme.primary,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.padding(10.dp))
+                }
             }
         }
     }

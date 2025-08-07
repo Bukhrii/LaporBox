@@ -18,7 +18,7 @@ android {
         applicationId = "com.pillbox.laporbox"
         minSdk = 27
         targetSdk = 36
-        versionCode = 1082501
+        versionCode = 8082501
         versionName = "1.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

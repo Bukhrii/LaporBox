@@ -13,16 +13,13 @@ class SyncResepWorker(
 
     override suspend fun doWork(): Result {
         return try {
-            // Panggil fungsi sinkronisasi dari repository
             val isSuccess = resepRepository.syncPendingReseps()
             if (isSuccess) {
                 Result.success()
             } else {
-                // Jika ada beberapa yang gagal, coba lagi nanti
                 Result.retry()
             }
         } catch (e: Exception) {
-            // Jika ada error (misal: tidak ada internet), coba lagi nanti
             Result.retry()
         }
     }

@@ -1,13 +1,17 @@
 <resources>
     <string name="app_name">LaporBox</string>
 
-    <string name="onboarding_title_first">Selamat datang di LaporBox</string>
+    <string name="onboarding_title_first">Tetap teratur. Tetap sehat!</string>
     <string name="onboarding_title_second">Obat Tak Pernah Terlewat</string>
     <string name="onboarding_title_third">Minum Obat? Foto Dulu!</string>
     <string name="onboarding_title_fourth">Sehat &amp; Terkontrol</string>
     <string name="onboarding_title_fifth">Dosis Terjaga, Demi Hidup Lebih Bermakna</string>
+    <string name="onboarding_title_sixth">Kami akan terus mendukung Anda agar tetap konsisten.</string>
+    <string name="onboarding_title_seventh">Jam berapa anda makan pagi?</string>
+    <string name="onboarding_title_eighth">Jam berapa anda makan siang?</string>
+    <string name="onboarding_title_ninth">Jam berapa anda makan malam?</string>
 
-    <string name="onboarding_description_first">Tetap Teratur, Tetap Sehat.</string>
+
     <string name="onboarding_description_second">Pengguna akan menerima pengingat minum obat sesuai resep dari dokter. Obat harus diminum sesuai jadwal dan dosis tepat waktu, setiap hari.</string>
     <string name="onboarding_description_third">Pengguna wajib unggah foto kondisi pillbox saat ini. AI kami akan memvalidasi secara otomatis. Transparan dan aman.</string>
     <string name="onboarding_description_fourth">Setiap data dikumpulkan jadi laporan, semua berbasis bukti visual &amp; sistem cerdas. Dokter dan keluarga bisa fokus pada pemulihan pasien. AI membantu memproses laporan &amp; validasi.</string>
@@ -19,7 +23,7 @@
     <string name="dokter_form_name">Nama Dokter</string>
     <string name="dokter_form_hint_name">Ketikkan nama dokter</string>
     <string name="dokter_form_faskes">Email Faskes</string>
-    <string name="dokter_form_hint_faskes">Ketikkan email resmi rumah sakit / klinik</string>
+    <string name="dokter_form_hint_faskes">Ketikkan email resmi fasilitas kesehatan</string>
 
     <string name="kontrol_form_headline">Tanggal Pemeriiksaan / Kontrol</string>
     <string name="kontrol_form_description">Kami akan mencatat nama dokter dan faskes yang menangani agar laporan bisa tersampaikan dengan benar.</string>
@@ -47,7 +51,7 @@
     <string name="obat_form_description">Obat Apa yang Kamu Konsumsi Saat ini dan seberapa sering kamu minum obat dalam sehari?</string>
     <string name="obat_form_name">Nama Obat</string>
     <string name="obat_form_hint_name">Ketikkan nama obat</string>
-    <string name="obat_form_frequency">Frekuensi minum obat</string>
+    <string name="obat_form_frequency">Frekuensi Minum Obat</string>
     <string name="obat_form_hint_frequency">Ketikkan frekuensi minum obat</string>
 
     <string name="button_next">Selanjutnya</string>
@@ -82,4 +86,5 @@
     <string name="password_confirm">Konfirmasi Kata Sandi</string>
     <string name="username">Nama Pengguna</string>
     <string name="phone_number">Nomor Telpon</string>
+
 </resources>

@@ -38,9 +38,6 @@ fun ProfileScreen(
     val state by viewModel.uiState.collectAsState()
     val user = state.user
 
-    val resepList by homeViewModel.reseps.collectAsState()
-    val resepIdForLaporan = resepList.firstOrNull()?.id ?: ""
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -52,12 +49,6 @@ fun ProfileScreen(
                 }
             )
         },
-        bottomBar = {
-            BottomNavigation(
-                navController = navController,
-                resepIdForLaporan = resepIdForLaporan
-            )
-        }
     ) { paddingValues ->
         Column(
             modifier = Modifier

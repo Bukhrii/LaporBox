@@ -26,12 +26,12 @@ fun Button(
             containerColor = containerColor,
             contentColor = contentColor
         ),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(24.dp),
         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.labelLarge,
         )
     }
 }

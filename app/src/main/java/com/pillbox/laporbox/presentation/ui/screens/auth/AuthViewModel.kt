@@ -18,6 +18,7 @@ sealed class AuthState {
     data class Error(val message: String) : AuthState()
 }
 
+
 class AuthViewModel(
     private val auth: FirebaseAuth,
     private val userRepository: UserRepository
@@ -58,11 +59,11 @@ class AuthViewModel(
         confirmPassword: String
     ) {
         if (username.isBlank() || email.isEmpty() || password.isEmpty() || confirmPassword.isBlank()) {
-            _authState.value = AuthState.Error("Semua field tidak boleh kosong")
+            _authState.value = AuthState.Error("Tidak boleh ada yang tidak diisi")
             return
         }
         if (password != confirmPassword) {
-            _authState.value = AuthState.Error("Password dan konfirmasi tidak cocok")
+            _authState.value = AuthState.Error("Password dan konfirmasi password tidak cocok")
             return
         }
 
